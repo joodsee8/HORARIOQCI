@@ -202,117 +202,26 @@ async function ejecutarGenerador() {
     }
 
     const chkCupos = document.getElementById('chkCuposEnVivo');
+    if (chkCupos && chkCupos.checked) {
+        if(btn) btn.innerHTML = 'Consultando SIIAU en vivo... ⏳';
+        let minCupos = parseInt(document.getElementById('minCuposVal').value) || 1;
+        let nrcsAProbar = gruposMaterias.flat(); 
 
-if (chkCupos && chkCupos.checked) {
-    if (btn) {
-        btn.innerHTML = 'Consultando SIIAU en vivo... ⏳';
-    }
+        try {
+            const dictCupos = await consultarCuposEnVivo(nrcsAProbar);
 
-    const minCupos =
-        parseInt(
-            document.getElementById('minCuposVal').value
-        ) || 1;
-
-    // Convertimos todos los NRC a texto
-    const nrcsAProbar = gruposMaterias
-        .flat()
-        .map(nrc => String(nrc).trim());
-
-    try {
-        const dictCupos =
-            await consultarCuposEnVivo(nrcsAProbar);
-
-        console.log(
-            '📦 Respuesta completa del backend:',
-            dictCupos
-        );
-
-        console.log(
-            '🎯 NRC enviados:',
-            nrcsAProbar
-        );
-
-        console.log(
-    'RESPUESTA DE CUPOS:',
-    JSON.stringify(dictCupos, null, 2)
-);
-
-        for (
-            let i = 0;
-            i < gruposMaterias.length;
-            i++
-        ) {
-            gruposMaterias[i] =
-                gruposMaterias[i].filter(nrc => {
-
-                    const nrcNormalizado =
-                        String(nrc).trim();
-
-                    const datos =
-                        dictCupos[nrcNormalizado];
-
-                    console.log(
-                        `NRC ${nrcNormalizado}:`,
-                        datos
-                    );
-
-                    // Si el backend no encontró el NRC,
-                    // NO lo tratamos automáticamente
-                    // como "sin cupos".
-                    if (!datos) {
-                        console.warn(
-                            `⚠️ El backend no devolvió datos para el NRC ${nrcNormalizado}`
-                        );
-
-                        return false;
-                    }
-
-                    const disponibles =
-                        Number(datos.disponibles) || 0;
-
-                    console.log(
-                        `NRC ${nrcNormalizado}: ${disponibles} disponibles`
-                    );
-
-                    return disponibles >= minCupos;
-                });
-
-            if (gruposMaterias[i].length === 0) {
-                if (btn) {
-                    btn.innerHTML =
-                        'Generar Opciones';
-
-                    btn.disabled = false;
+            for (let i = 0; i < gruposMaterias.length; i++) {
+                gruposMaterias[i] = gruposMaterias[i].filter(nrc => ((dictCupos[nrc] && dictCupos[nrc].disponibles) || 0) >= minCupos);
+                if (gruposMaterias[i].length === 0) {
+                    if(btn) { btn.innerHTML = 'Generar Opciones'; btn.disabled = false; }
+                    return alert(`Sold Out 💀:\n"${cursosGenerador[i].nombre}"\nNingún grupo disponible tiene ${minCupos} cupo(s) en este momento.`);
                 }
-
-                return alert(
-                    `Sold Out 💀:\n` +
-                    `"${cursosGenerador[i].nombre}"\n` +
-                    `Ningún grupo disponible tiene ` +
-                    `${minCupos} cupo(s) en este momento.`
-                );
             }
+        } catch (error) {
+            if(btn) { btn.innerHTML = 'Generar Opciones'; btn.disabled = false; }
+            return alert("⚠️ Error al conectar con el backend para checar cupos. Revisa tu terminal.");
         }
-
-    } catch (error) {
-        console.error(
-            '❌ Error consultando cupos:',
-            error
-        );
-
-        if (btn) {
-            btn.innerHTML =
-                'Generar Opciones';
-
-            btn.disabled = false;
-        }
-
-        return alert(
-            '⚠️ Error al conectar con el backend ' +
-            'para checar cupos. Revisa tu terminal.'
-        );
     }
-}
 
     if(btn) btn.innerHTML = 'Armando combinaciones masivas...';
 
@@ -354,6 +263,7 @@ if (chkCupos && chkCupos.checked) {
         } else { window.resultadosFav = []; }
 
         resultadosMostrados = 0;
+        window.cardState = {};
         document.getElementById('resultadosGenerador').innerHTML = '';
         mostrarMasResultados();
 
@@ -378,26 +288,51 @@ function calcularPuntajeHorario(nrcs) {
 }
 
 function armarTarjetaHorario(res, index, tag) {
+    const uid = `${tag}-${index}`;
+    window.cardState[uid] = { nrcs: [...res], index, tag };
+    return `<div class="gen-opcion" id="card-${uid}" style="margin-bottom:0;">${cuerpoTarjeta(uid)}</div>`;
+}
+
+// Construye el contenido interno de una tarjeta a partir de su estado actual.
+// Separado de armarTarjetaHorario para poder volver a dibujar SOLO esta tarjeta
+// (sin tocar el resto de las opciones) cuando el usuario cambia un maestro.
+function cuerpoTarjeta(uid) {
+    const state = window.cardState[uid];
+    const res = state.nrcs; const index = state.index; const tag = state.tag;
+
     let scoreEfi = Math.round(calcularPuntajeHorario(res));
     let scoreFav = calcularPuntajeFavoritos(res, window.prefsGeneradorGlobal.favoritos);
-    
+
     let htmlList = '<ul style="list-style:none; padding:0; margin-top:15px;">';
-    res.forEach(nrc => {
+    res.forEach((nrc, posicion) => {
         let m = ofertaAcademica[nrc]; let hrs = m.horarios.map(h => `${h.dia} ${h.inicio}-${h.fin}`).join(' | ');
         let esFav = window.prefsGeneradorGlobal.favoritos.includes(m.profesor?.trim()) ? '⭐ ' : '';
-        htmlList += `<li style="font-size:12px; margin-bottom:5px; color:var(--text-muted);"><strong style="color:#fff;">${m.materia}</strong><br><span style="color:var(--accent-blue);">NRC: ${nrc}</span> | Prof: <span style="color:#fff">${esFav}${m.profesor || 'Por definir'}</span><br><i>${hrs}</i></li>`;
+        htmlList += `<li style="font-size:12px; margin-bottom:8px; color:var(--text-muted);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                <div style="flex:1; min-width:0;">
+                    <strong style="color:#fff;">${m.materia}</strong><br>
+                    <span style="color:var(--accent-blue);">NRC: ${nrc}</span> | Prof: <span style="color:#fff">${esFav}${m.profesor || 'Por definir'}</span><br>
+                    <i>${hrs}</i>
+                </div>
+                <button type="button" style="flex-shrink:0; background:rgba(10,132,255,0.15); color:#0A84FF; border:1px solid rgba(10,132,255,0.4); border-radius:8px; padding:5px 8px; font-size:11px; cursor:pointer; white-space:nowrap;" onclick="abrirSelectorMaestro('${uid}', ${posicion}, '${m.clave}')">🔄 Cambiar</button>
+            </div>
+        </li>`;
     });
     htmlList += '</ul>';
 
     let jsonArr = JSON.stringify(res);
-    return `<div class="gen-opcion" style="margin-bottom:0;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+    return `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <h4 style="margin:0; border:none; font-size:14px;">Opción #${index + 1} <span style="font-size:10px; opacity:0.6;">(${tag})</span></h4>
             <button class="btn-submit" style="background:rgba(48, 209, 88, 0.2) !important; color:#30D158 !important; border:1px solid rgba(48, 209, 88, 0.4); padding:6px 12px; font-size:12px;" onclick='aplicarHorarioGenerado(${jsonArr})'>Aplicar</button>
         </div>
         <div style="font-size:11px; margin-bottom:10px;"><span style="color:#FFD60A; margin-right:10px; font-weight:bold;">⭐ Favoritos: ${scoreFav}</span><span style="color:#64D2FF; font-weight:bold;">⚡ Eficiencia: ${scoreEfi}</span></div>
-        <div class="mini-cal">${dibujarMiniCalendario(res)}</div>${htmlList}
-    </div>`;
+        <div class="mini-cal">${dibujarMiniCalendario(res)}</div>${htmlList}`;
+}
+
+// Vuelve a dibujar SOLO la tarjeta indicada, tomando su estado actualizado.
+function renderizarTarjeta(uid) {
+    const el = document.getElementById(`card-${uid}`);
+    if (el) el.innerHTML = cuerpoTarjeta(uid);
 }
 
 function mostrarMasResultados() {
@@ -469,3 +404,111 @@ function dibujarMiniCalendario(arregloNrcs) {
 
 window.aplicarHorarioGenerado = function(arrNrcs) { if(confirm("¿Reemplazar tu horario actual con esta opción?")) { horarioActual = arrNrcs; guardarHorario(); cambiarPagina('horario-page'); } }
 
+// =================================================================
+// 9b. CAMBIAR MAESTRO/HORARIO DENTRO DE UNA OPCIÓN GENERADA
+// =================================================================
+
+function formatearHorariosMaestro(horarios) {
+    const validos = horarios.filter(h => h.inicio !== "00:00" && h.inicio !== "0:00");
+    if (validos.length === 0) return "Sin horario definido";
+    return validos.map(h => `${h.dia}: ${h.inicio} - ${h.fin}`).join(' | ');
+}
+
+// Abre la ventana flotante con todos los grupos/maestros disponibles para
+// la materia en esa posición de la opción generada (uid = tarjeta, posicion = índice dentro del arreglo de esa opción).
+async function abrirSelectorMaestro(uid, posicion, claveMateria) {
+    const state = window.cardState[uid];
+    if (!state) return;
+    const nrcActual = state.nrcs[posicion];
+    let candidatos = Object.keys(ofertaAcademica).filter(k => ofertaAcademica[k].clave === claveMateria);
+
+    cerrarModalMaestro();
+    const overlay = document.createElement('div');
+    overlay.id = 'modalCambiarMaestroOverlay';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:9999; display:flex; align-items:flex-end; justify-content:center;';
+    overlay.onclick = (e) => { if (e.target === overlay) cerrarModalMaestro(); };
+
+    overlay.innerHTML = `
+        <div style="width:100%; max-width:480px; max-height:85vh; background:#1c1c1e; border-radius:20px 20px 0 0; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 -4px 30px rgba(0,0,0,0.5);">
+            <div style="padding:16px 18px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+                <h3 style="margin:0; font-size:15px; color:#fff;">Elegir Maestro / Horario</h3>
+                <button type="button" onclick="cerrarModalMaestro()" style="background:rgba(255,255,255,0.1); border:none; color:#fff; width:28px; height:28px; border-radius:50%; font-size:16px; cursor:pointer; flex-shrink:0;">✕</button>
+            </div>
+            <div id="listaMaestrosModal" style="overflow-y:auto; -webkit-overflow-scrolling:touch; padding:12px 14px calc(14px + env(safe-area-inset-bottom, 0px)); flex:1;">
+                <p style="color:var(--text-muted); font-size:13px; text-align:center; padding:20px 0;">Cargando opciones...</p>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+
+    const chkCupos = document.getElementById('chkCuposEnVivo');
+    const usarCuposEnVivo = !!(chkCupos && chkCupos.checked);
+    let mapaCupos = null;
+
+    if (usarCuposEnVivo) {
+        try {
+            mapaCupos = await consultarCuposEnVivo(candidatos);
+            let minCupos = parseInt(document.getElementById('minCuposVal')?.value) || 1;
+            candidatos = candidatos.filter(nrc => nrc === nrcActual || ((mapaCupos[nrc] && mapaCupos[nrc].disponibles) || 0) >= minCupos);
+        } catch (e) {
+            const aviso = document.getElementById('listaMaestrosModal');
+            if (aviso) aviso.innerHTML = `<p style="color:#FF9F0A; font-size:12px; text-align:center; padding:10px 0;">⚠️ No se pudo verificar cupos en vivo. Mostrando todas las opciones.</p>`;
+            mapaCupos = null;
+        }
+    }
+
+    // El modal pudo haberse cerrado mientras esperábamos la respuesta del backend
+    const contenedor = document.getElementById('listaMaestrosModal');
+    if (!contenedor) return;
+
+    if (candidatos.length === 0) {
+        contenedor.innerHTML = `<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:20px 0;">No hay otras opciones disponibles${usarCuposEnVivo ? ' con cupo' : ''}.</p>`;
+        return;
+    }
+
+    let html = '';
+    candidatos.forEach(nrc => {
+        const curso = ofertaAcademica[nrc];
+        const esActual = nrc === nrcActual;
+        const dias = formatearHorariosMaestro(curso.horarios);
+        let badgeCupos = '';
+        if (mapaCupos && mapaCupos[nrc]) {
+            const dis = mapaCupos[nrc].disponibles;
+            const color = dis > 0 ? '#30D158' : '#FF453A';
+            badgeCupos = `<div style="margin-top:6px; font-size:11px; font-weight:bold; color:${color};">🟢 ${dis} cupo(s) disponibles</div>`;
+        }
+        html += `<div onclick="seleccionarNuevoMaestro('${uid}', ${posicion}, '${nrc}')" style="padding:12px; margin-bottom:8px; border-radius:12px; cursor:pointer; background:${esActual ? 'rgba(10,132,255,0.15)' : 'rgba(255,255,255,0.04)'}; border:1px solid ${esActual ? 'rgba(10,132,255,0.5)' : 'rgba(255,255,255,0.08)'};">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <strong style="font-size:13px; color:#fff;">Maestro: ${curso.profesor || 'Por definir'}</strong>
+                ${esActual ? '<span style="font-size:10px; color:#0A84FF; font-weight:bold; flex-shrink:0;">ACTUAL</span>' : ''}
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Días: ${dias}</div>
+            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">NRC: ${nrc}</div>
+            ${badgeCupos}
+        </div>`;
+    });
+    contenedor.innerHTML = html;
+}
+
+function cerrarModalMaestro() {
+    const overlay = document.getElementById('modalCambiarMaestroOverlay');
+    if (overlay) overlay.remove();
+}
+
+// Reemplaza el NRC de esa materia SOLO dentro de esta opción generada,
+// valida que no choque con las demás materias de la misma opción, y
+// vuelve a dibujar nada más esa tarjeta.
+function seleccionarNuevoMaestro(uid, posicion, nuevoNrc) {
+    const state = window.cardState[uid];
+    if (!state) return;
+    if (state.nrcs[posicion] === nuevoNrc) { cerrarModalMaestro(); return; }
+
+    const otrasMaterias = state.nrcs.filter((_, i) => i !== posicion);
+    if (choca(ofertaAcademica[nuevoNrc], otrasMaterias)) {
+        alert('⚠️ Ese horario choca con otra materia de esta misma opción. Elige otro grupo.');
+        return;
+    }
+
+    state.nrcs[posicion] = nuevoNrc;
+    cerrarModalMaestro();
+    renderizarTarjeta(uid);
+}
