@@ -11,7 +11,7 @@ async function cambiarCatalogoCarrera() {
         cargarDatalist();
     } else {
         try {
-            const respuesta = await fetch(`https://generador-horarios-cucei.onrender.com/api/catalogo/${carrera}`);
+            const respuesta = await fetch(`https://horarioqci.onrender.com/api/catalogo/${carrera}`);
             if (!respuesta.ok) throw new Error("Catálogo no encontrado");
             const datosJson = await respuesta.json();
             txtArea.value = JSON.stringify(datosJson, null, 2);

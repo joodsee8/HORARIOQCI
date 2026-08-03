@@ -1,1 +1,653 @@
-{"hola"}
+{
+  "I6494": {
+    "nombre": "DESARROLLO ORGANIZACIONAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5802": {
+    "nombre": "ALGEBRA LINEAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5817": {
+    "nombre": "BALANCES DE MATERIA Y ENERGIA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5800": {
+    "nombre": "CALCULO DIFERENCIAL E INTEGRAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5874": {
+    "nombre": "DISEÑO DE EXPERIMENTOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5809": {
+    "nombre": "ELECTRICIDAD Y MAGNETISMO",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5814": {
+    "nombre": "ELEMENTOS DE DISEÑO DE EQUIPOS DE PROCESOS QUIMICOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5812": {
+    "nombre": "FISICOQUIMICA PARA INGENIEROS I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5816": {
+    "nombre": "INTRODUCCION A LA INGENIERIA AMBIENTAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5808": {
+    "nombre": "LABORATORIO DE MECANICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5811": {
+    "nombre": "LABORATORIO DE QUIMICA PARA INGENIEROS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5818": {
+    "nombre": "MATEMATICAS APLICADAS A LA INGENIERIA QUIMICA I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5807": {
+    "nombre": "MECANICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5849": {
+    "nombre": "MODULO DE AVANCE DEL PROYECTO I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5799": {
+    "nombre": "PRECALCULO",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5801": {
+    "nombre": "PROBABILIDAD Y ESTADISTICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5803": {
+    "nombre": "QUIMICA GENERAL I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5804": {
+    "nombre": "QUIMICA GENERAL II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5805": {
+    "nombre": "QUIMICA ORGANICA I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5806": {
+    "nombre": "QUIMICA ORGANICA II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5815": {
+    "nombre": "SEMINARIO DE INDUCCION PARA INGENIEROS QUIMICOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5876": {
+    "nombre": "CIENCIA E INGENIERIA DE LOS MATERIALES",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I6484": {
+    "nombre": "HISTORIA DE LA TECNOLOGIA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5821": {
+    "nombre": "INTRODUCCION A LOS FENOMENOS DE TRANSPORTE",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5820": {
+    "nombre": "MATEMATICAS APLICADAS A LA INGENIERIA QUIMICA II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5819": {
+    "nombre": "TERMODINAMICA QUIMICA APLICADA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5813": {
+    "nombre": "FISICOQUIMICA PARA INGENIEROS II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5822": {
+    "nombre": "LABORATORIO DE ANALISIS QUIMICO INSTRUMENTAL PARA INGENIEROS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5810": {
+    "nombre": "ADMINISTRACION DE RECURSOS HUMANOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I6487": {
+    "nombre": "ANALISIS CONTABLE",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I6488": {
+    "nombre": "CALIDAD TOTAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I6489": {
+    "nombre": "CONTROL ESTADISTICO DE LA CALIDAD",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I6491": {
+    "nombre": "FINANZA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I6492": {
+    "nombre": "TEORIA DE DECISIONES",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I6493": {
+    "nombre": "PROBLEMAS SOCIOECONOMICOS Y POLITICOS DE MEXICO",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5823": {
+    "nombre": "MATEMATICAS APLICADAS A LA INGENIERIA QUIMICA III",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5824": {
+    "nombre": "MECANICA DE FLUIDOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5825": {
+    "nombre": "LABORATORIO DE MECANICA DE FLUIDOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5826": {
+    "nombre": "MANEJO Y SEPARACION MECANICA DE MATERIALES",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5827": {
+    "nombre": "LABORATORIO DE MANEJO Y SEPARACION MECANICA DE MATERIALES",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5828": {
+    "nombre": "INTRODUCCION A LA BIOTECNOLOGIA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5877": {
+    "nombre": "TRATAMIENTO DE AGUAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5831": {
+    "nombre": "LABORATORIO DE TRANSFERENCIA DE MASA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5850": {
+    "nombre": "MODULO DE AVANCE DEL PROYECTO II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5834": {
+    "nombre": "ETICA EN LA INDUSTRIA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5832": {
+    "nombre": "TRANSFERENCIA DE CALOR",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I6490": {
+    "nombre": "ASEGURAMIENTO Y ADMINISTRACION DE LA CALIDAD",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5833": {
+    "nombre": "LABORATORIO DE TRANSFERENCIA DE CALOR",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5830": {
+    "nombre": "TRANSFERENCIA DE MASA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5829": {
+    "nombre": "CINETICA QUIMICA Y CATALISIS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5835": {
+    "nombre": "SEGURIDAD DE PROCESOS Y PREVENCION DE PERDIDAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5836": {
+    "nombre": "PROCESOS DE SEPARACION I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5838": {
+    "nombre": "ANALISIS DE REACTORES QUIMICOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5839": {
+    "nombre": "LABORATORIO DE REACTORES QUIMICOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5840": {
+    "nombre": "DISEÑO DE EQUIPO DE PROCESOS QUIMICOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5841": {
+    "nombre": "SISTEMAS DE EXCELENCIA Y NORMATIVIDAD EN INGENIERIA QUIMICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5842": {
+    "nombre": "MODELADO DINAMICO Y OPTIMIZACION DE PROCESOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5853": {
+    "nombre": "CIENCIA E INGENIERIA DE LOS COLOIDES",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5879": {
+    "nombre": "TEMAS SELECTOS EN INGENIERIA QUIMICA I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5869": {
+    "nombre": "PROYECTO MODULAR DE FUNDAMENTOS DE PROCESOS DE TRANSFORMACION",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5870": {
+    "nombre": "PROYECTO MODULAR DE FENOMENOLOGIA DE PROCESOS DE TRANSFORMACION",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5871": {
+    "nombre": "PROYECTO MODULAR DE PROCESOS DE TRANSFORMACION BASICOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5872": {
+    "nombre": "PROYECTO MODULAR DE SISTEMAS DE PROCESOS DE TRANSFORMACION",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "IA896": {
+    "nombre": "PRACTICAS PROFESIONALES",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5837": {
+    "nombre": "LABORATORIO DE PROCESOS DE SEPARACION",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5843": {
+    "nombre": "PROCESOS DE SEPARACION II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5851": {
+    "nombre": "MODULO DE AVANCE DEL PROYECTO III",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I6486": {
+    "nombre": "FILOSOFIA DE LA CIENCIA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5856": {
+    "nombre": "ELECTROQUIMICA I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5848": {
+    "nombre": "INGENIERIA ECONOMICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5857": {
+    "nombre": "ELECTROQUIMICA II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5844": {
+    "nombre": "CONTROL DE PROCESOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5845": {
+    "nombre": "LABORATORIO DE CONTROL DE PROCESOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5846": {
+    "nombre": "DISEÑO DE PLANTAS Y PROCESOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5847": {
+    "nombre": "INGENIERIA DE SERVICIOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I5852": {
+    "nombre": "MODULO DE AVANCE DEL PROYECTO IV",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5858": {
+    "nombre": "INTRODUCCION A LA CIENCIA Y TECNOLOGIA DE POLIMEROS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5859": {
+    "nombre": "INTRODUCCION A LA TECNOLOGIA DE ALIMENTOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5860": {
+    "nombre": "INTRODUCCION A LA BIOINGENIERIA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5861": {
+    "nombre": "INTRODUCCION A LA INGENIERIA QUIMICA ADMINISTRATIVA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5862": {
+    "nombre": "INTRODUCCION A LA CELULOSA Y PAPEL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I6483": {
+    "nombre": "SEMINARIO DE TITULACION PARA INGENIEROS QUIMICOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5864": {
+    "nombre": "TECNOLOGIA DE ALIMENTOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5867": {
+    "nombre": "CELULOSA Y PAPEL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5880": {
+    "nombre": "TEMAS SELECTOS EN INGENIERIA QUIMICA II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I5868": {
+    "nombre": "INGENIERIA AMBIENTAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5865": {
+    "nombre": "BIOINGENIERIA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I6495": {
+    "nombre": "LEGISLACION",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5855": {
+    "nombre": "INTRODUCCION A LA PETROQUIMICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I5873": {
+    "nombre": "ALGORITMOS Y PROGRAMAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I5878": {
+    "nombre": "INGENIERIA DE PROCESOS ASISTIDA POR COMPUTADORA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "V2455": {
+    "nombre": "ANALISIS DE PROBLEMAS GLOBALES DEL SIGLO XXI",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5875": {
+    "nombre": "CONTROL DE CALIDAD APLICADA A PROCESOS DE TRANSFORMACION",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  }
+}
