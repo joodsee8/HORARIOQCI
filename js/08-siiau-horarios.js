@@ -11,7 +11,7 @@ async function descargarOfertaAPI() {
     estado.style.color = "#FF9F0A"; estado.innerText = "Conectando al servidor y extrayendo datos del SIIAU... ⏳";
 
     try {
-        const respuesta = await fetch('http://localhost:3000/api/extraer-oferta', {
+        const respuesta = await fetch('https://horarioqci.onrender.com/api/extraer-oferta', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ciclo, centro, carrera })
@@ -132,7 +132,7 @@ async function consultarCuposEnVivo(nrcs) {
     });
 
     const respuesta = await fetch(
-        'http://localhost:3000/api/consultar-cupos',
+        'https://horarioqci.onrender.com/api/consultar-cupos',
         {
             method: 'POST',
 
