@@ -201,27 +201,128 @@ async function ejecutarGenerador() {
         return alert(`Imposible agendar:\n"${errorFaltaOferta}"\nTodos sus profes están vetados o no encajan en tus horas.`);
     }
 
-    const chkCupos = document.getElementById('chkCuposEnVivo');
-    if (chkCupos && chkCupos.checked) {
-        if(btn) btn.innerHTML = 'Consultando SIIAU en vivo... ⏳';
-        let minCupos = parseInt(document.getElementById('minCuposVal').value) || 1;
-        let nrcsAProbar = gruposMaterias.flat(); 
+const chkCupos = document.getElementById('chkCuposEnVivo');
 
-        try {
-            const dictCupos = await consultarCuposEnVivo(nrcsAProbar);
+if (chkCupos && chkCupos.checked) {
 
-            for (let i = 0; i < gruposMaterias.length; i++) {
-                gruposMaterias[i] = gruposMaterias[i].filter(nrc => ((dictCupos[nrc] && dictCupos[nrc].disponibles) || 0) >= minCupos);
-                if (gruposMaterias[i].length === 0) {
-                    if(btn) { btn.innerHTML = 'Generar Opciones'; btn.disabled = false; }
-                    return alert(`Sold Out 💀:\n"${cursosGenerador[i].nombre}"\nNingún grupo disponible tiene ${minCupos} cupo(s) en este momento.`);
-                }
-            }
-        } catch (error) {
-            if(btn) { btn.innerHTML = 'Generar Opciones'; btn.disabled = false; }
-            return alert("⚠️ Error al conectar con el backend para checar cupos. Revisa tu terminal.");
-        }
+    // Tomamos primero la carrera del calendario
+    let carrera = document
+        .getElementById('apiCarrera')
+        ?.value
+        .trim()
+        .toUpperCase() || '';
+
+    // Si el calendario no tiene carrera,
+    // usamos la carrera elegida en el nuevo select
+    if (!carrera) {
+        carrera = document
+            .getElementById('carreraCupos')
+            ?.value
+            .trim()
+            .toUpperCase() || '';
     }
+
+    // Si no hay carrera en ninguno de los dos,
+    // detenemos el proceso antes de consultar SIIAU
+    if (!carrera) {
+        if (btn) {
+            btn.innerHTML = 'Generar Opciones';
+            btn.disabled = false;
+        }
+
+        return alert(
+            '🎓 Selecciona una carrera para consultar los cupos en vivo.'
+        );
+    }
+
+    // Guardamos la carrera seleccionada en apiCarrera
+    // para que consultarCuposEnVivo() la pueda usar
+    const apiCarrera =
+        document.getElementById('apiCarrera');
+
+    if (apiCarrera) {
+        apiCarrera.value = carrera;
+    }
+
+    // Ahora sí consultamos SIIAU
+    if (btn) {
+        btn.innerHTML =
+            'Consultando SIIAU en vivo... ⏳';
+    }
+
+    const minCupos =
+        parseInt(
+            document
+                .getElementById('minCuposVal')
+                ?.value
+        ) || 1;
+
+    const nrcsAProbar =
+        gruposMaterias.flat();
+
+    try {
+
+        const dictCupos =
+            await consultarCuposEnVivo(
+                nrcsAProbar
+            );
+
+        for (
+            let i = 0;
+            i < gruposMaterias.length;
+            i++
+        ) {
+
+            gruposMaterias[i] =
+                gruposMaterias[i].filter(
+                    nrc =>
+                        (
+                            dictCupos[nrc]
+                                ?.disponibles || 0
+                        ) >= minCupos
+                );
+
+            if (
+                gruposMaterias[i].length === 0
+            ) {
+
+                if (btn) {
+                    btn.innerHTML =
+                        'Generar Opciones';
+
+                    btn.disabled = false;
+                }
+
+                return alert(
+                    `Sold Out 💀:\n` +
+                    `"${cursosGenerador[i].nombre}"\n` +
+                    `Ningún grupo disponible tiene ` +
+                    `${minCupos} cupo(s) ` +
+                    `en este momento.`
+                );
+            }
+        }
+
+    } catch (error) {
+
+        console.error(
+            '❌ Error consultando cupos:',
+            error
+        );
+
+        if (btn) {
+            btn.innerHTML =
+                'Generar Opciones';
+
+            btn.disabled = false;
+        }
+
+        return alert(
+            '⚠️ Error al conectar con el backend ' +
+            'para checar cupos.'
+        );
+    }
+}
 
     if(btn) btn.innerHTML = 'Armando combinaciones masivas...';
 
