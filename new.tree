@@ -1,0 +1,41 @@
+├── .env
+├── .gitignore
+├── catalogoiq.json
+├── catalogos
+│  ├── INDU.json
+│  ├── ININ.json
+│  └── INQU.json
+├── index.html
+├── js
+│  ├── 01-variables.js
+│  ├── 02-inicio.js
+│  ├── 03-navegacion.js
+│  ├── 04-catalogos.js
+│  ├── 05-materias-malla.js
+│  ├── 06-renderizado.js
+│  ├── 07-respaldos.js
+│  ├── 08-siiau-horarios.js
+│  ├── 09-generador.js
+│  ├── 10-dashboard.js
+│  ├── 11-sync-mongodb.js
+│  └── 12-ux.js
+├── loader.js
+├── materia.ts
+├── oferta_2026.json
+├── package-lock.json
+├── package.json
+├── partials
+│  ├── dashboard-page.html
+│  ├── form-page.html
+│  ├── generador-page.html
+│  ├── grid-page.html
+│  ├── horario-page.html
+│  ├── list-page.html
+│  ├── nav.html
+│  ├── practicas-page.html
+│  ├── social-page.html
+│  └── sync-panel.html
+├── README.md
+├── server.ts
+├── style.css
+└── tsconfig.json

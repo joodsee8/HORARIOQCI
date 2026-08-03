@@ -1,0 +1,56 @@
+        <div id="horario-page" class="page">
+            <div class="page-header">
+                <h2>Armador de Horarios por Semestre</h2>
+            </div>
+            <div class="buscador-container">
+                <h3 style="margin-top: 0;">Descargar Oferta Académica</h3>
+                <p style="font-size:13px; color:var(--text-muted);">Conecta con el servidor backend para extraer los horarios más recientes en tiempo real.</p>
+                
+              <div class="formulario-dinamico">
+                    <!-- 1. Ciclo Totalmente Libre -->
+                    <input type="text" id="apiCiclo" value="202620" placeholder="Ciclo (Ej: 202610)" title="Ingresa el ciclo. Ej: 202610 (Calendario A), 202620 (Calendario B)">
+                    
+                    <!-- 2. Todos los Centros Universitarios de la Red UdeG -->
+                    <select id="apiCentro" >
+                        <option value="D">CUCEI (D)</option>
+                        <option value="C">CUCEA (C)</option>
+                        <option value="E">CUCS (E)</option>
+                        <option value="A">CUAAD (A)</option>
+                        <option value="B">CUCBA (B)</option>
+                        <option value="F">CUCSH (F)</option>
+                        <option value="H">CUTONALÁ (H)</option>
+                        <option value="Q">UDGVirtual (Q)</option>
+                        <option value="I">CUALTOS (I)</option>
+                        <option value="J">CULAGOS (J)</option>
+                        <option value="K">CUSUR (K)</option>
+                        <option value="L">CUCIÉNEGA (L)</option>
+                        <option value="M">CUCOSTA (M)</option>
+                        <option value="N">CUNORTE (N)</option>
+                        <option value="O">CUVALLES (O)</option>
+                    </select>
+                    
+                    <!-- 3. Carrera Libre -->
+                    <select id="apiCarrera">
+                        <option value="">Selecciona tu carrera</option>
+                        <option value="INQU">Ingeniería Química</option>
+                        <option value="INDU">Ingeniería Industrial</option>
+                    </select>
+                    
+                    <button class="btn-submit" onclick="descargarOfertaAPI()">Extraer Oferta</button>
+                </div>
+                
+                <div id="estadoOferta" style="font-size: 13px; margin-top: 12px; color: #30D158; font-weight: 600;"></div>
+            </div>
+
+            <div class="buscador-container">
+                <label>Agregar NRC al Horario</label>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" id="nrcHorario" class="buscador-input" placeholder="Ej. 65187" style="margin-top:0;">
+                    <button class="btn-submit" onclick="agregarAlHorario()" style="max-width: 150px;">Agregar</button>
+                </div>
+            </div>
+
+            <div class="calendario-container" id="gridCalendario"></div>
+            <button class="btn-pdf" onclick="limpiarHorario()" style="margin-top: 15px; background: rgba(255, 69, 58, 0.2); color: #FF453A; border: 1px solid rgba(255, 69, 58, 0.4);">Borrar Horario Actual</button>
+        </div>
+

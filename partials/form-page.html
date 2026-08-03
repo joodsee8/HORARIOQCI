@@ -1,0 +1,96 @@
+        <div id="form-page" class="page active">
+            <div class="page-header">
+                <h2>Catálogo y Registro</h2>
+            </div>
+            
+            <div class="buscador-container">
+                <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="color: var(--accent-blue); font-weight: bold;">1. Selecciona tu Carrera</label>
+                        <select id="selectorCarrera" onchange="cambiarCatalogoCarrera()">
+                            <option value="INQU">Ingeniería Química (INQU)</option>
+                            <option value="INCO">Ingeniería en Computación (INCO)</option>
+                            <option value="INDU">Ingeniería Industrial (INDU)</option>
+                            <option value="CUSTOM">Otra / Personalizado (Pegar JSON)</option>
+                        </select>
+                    </div>
+                    <div style="flex: 2; min-width: 250px;">
+                        <label>2. Buscar Materia en el Catálogo</label>
+                        <input type="text" id="buscadorCatalogo" list="listaMaterias" placeholder="Escribe el nombre o clave..." oninput="seleccionarDelCatalogo(this.value)" style="margin-top: 0;">
+                        <datalist id="listaMaterias"></datalist>
+                    </div>
+                </div>
+
+                <details class="catalogo-section">
+                    <summary>Ver/Editar Datos del Catálogo Interno (JSON)</summary>
+                    <button class="btn-submit" style="margin-top: 10px; margin-bottom: 10px; background: rgba(48, 209, 88, 0.2) !important; color: #30D158 !important; border: 1px solid rgba(48, 209, 88, 0.4); width: 100%;" onclick="generarCatalogoDesdeOferta()">
+                        ✨ Auto-Construir Catálogo usando la Oferta Descargada (SIIAU)
+                    </button>
+                    <textarea id="jsonCatalogo" rows="10" onchange="cargarDatalist()"></textarea>
+                </details>
+            </div>
+
+            <h2 id="tituloFormulario">Registrar/Editar Materia</h2>
+            <div class="formulario">
+                <div><label>NRC (Clave)</label><input type="text" id="nrc" required></div>
+                <div><label>Nombre de la materia</label><input type="text" id="nombre" required></div>
+                <div><label>Semestre (Fila)</label><input type="number" id="semestre" required min="1"></div>
+                <div>
+                    <label>Ubicación (Columna)</label>
+                    <select id="letra">
+                        <option value="A">Columna A</option><option value="B">Columna B</option><option value="C">Columna C</option>
+                        <option value="D">Columna D</option><option value="E">Columna E</option><option value="F">Columna F</option>
+                        <option value="G">Columna G</option><option value="H">Columna H</option><option value="I">Columna I</option>
+                        <option value="J">Columna J</option><option value="K">Columna K</option><option value="L">Columna L</option>
+                        <option value="M">Columna M</option><option value="N">Columna N</option><option value="O">Columna O</option>
+                        <option value="P">Columna P</option><option value="Q">Columna Q</option><option value="R">Columna R</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Disponibilidad</label>
+                    <select id="apertura">
+                        <option value="ambos">Ambos Semestres</option>
+                        <option value="par">Solo Sem. Pares (2,4,6...)</option>
+                        <option value="impar">Solo Sem. Impares (1,3...)</option>
+                    </select>
+                </div>
+                <div><label>Créditos</label><input type="number" id="creditos" required min="0"></div>
+                <div>
+                    <label>Estado Actual</label>
+                    <select id="estado" onchange="gestionarEstado()">
+                        <option value="pendiente">Pendiente (Agendada)</option>
+                        <option value="cursando">Cursando Actualmente</option>
+                        <option value="aprobada">Aprobada</option>
+                        <option value="reprobada">Reprobada (Art. 33)</option>
+                        <option value="convalidada">Convalidada / Revalidada</option>
+                    </select>
+                </div>
+                <div><label>Calificación Final</label><input type="number" id="calificacion" placeholder="Opcional" min="0" max="100"></div>
+                <div><label>Prerrequisito</label><input type="text" id="prerequisito" placeholder="Ej. I5800"></div>
+                <div><label>Correquisito</label><input type="text" id="correquisito" placeholder="Ej. I5808"></div>
+                
+                <div style="grid-column: span 2;">
+                    <label>Módulo / Área</label>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
+                        <select id="colorMateria" onchange="actualizarColorPreview()" style="flex: 1;">
+                            <option value="#58db33">MÓDULO 1: Fundamentos de Proc. Transf.</option>
+                            <option value="#b61bee">MÓDULO 2: Fenomenología de Proc. Transf.</option>
+                            <option value="#f5950f">MÓDULO 3: Proc. de Transformación Básicos</option>
+                            <option value="#a8a8a8">MÓDULO 4: Sistemas de Proc. Transf.</option>
+                            <option value="#0ff5f1">Optativa Abierta de Formación Integral</option>
+                            <option value="#0f17f5">Especializante Selectiva</option>
+                            <option value="#ff5c5c">Proyectos Modulares</option>
+                            <option value="#ff75d3">Optativa Abierta de Tecnología</option>
+                            <option value="#6b8e23">Requisito de Grado (SS / PP)</option>
+                        </select>
+                        <div id="colorPreview" style="width: 32px; height: 32px; border-radius: 50%; background-color: #58db33; border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0; transition: 0.3s;"></div>
+                    </div>
+                </div>
+                
+                <div class="botones-form">
+                    <button id="btnSubmit" class="btn-submit" onclick="agregarMateria()">Guardar en el Sistema</button>
+                    <button id="btnCancelar" class="btn-submit" onclick="cancelarEdicion()" style="display: none;">Cancelar Edición</button>
+                </div>
+            </div>
+        </div>
+

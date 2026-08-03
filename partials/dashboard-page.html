@@ -1,0 +1,42 @@
+        <div id="dashboard-page" class="page">
+            <div class="page-header">
+                <h2>Dashboard y Analítica</h2>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <h3>Semestres Proyectados</h3>
+                    <div class="valor" id="dash-semestres">0</div>
+                    <p style="font-size: 12px; color:var(--text-muted);">Tu fecha de graduación depende de esto.</p>
+                </div>
+                <div class="dash-card">
+                    <h3>Créditos Aprobados</h3>
+                    <div class="valor" id="dash-creditos">0 / 418</div>
+                </div>
+                <div class="dash-card">
+                    <h3>Eficiencia Académica</h3>
+                    <div class="valor" id="dash-eficiencia">0%</div>
+                    <p style="font-size: 12px; color:var(--text-muted);">Materias aprobadas vs. cursadas.</p>
+                </div>
+            </div>
+
+            <details class="semestre-block" open>
+                <summary class="semestre-summary" style="color: #FF9F0A !important;">
+                    Camino Crítico (Cuellos de Botella)
+                </summary>
+                <div style="padding: 15px;">
+                    <p style="font-size: 13px; margin-top: 0; color:var(--text-muted);">Estas materias desbloquean más cursos. No las repruebes.</p>
+                    <ul class="lista-cuellos" id="listaCuellosBotella"></ul>
+                </div>
+            </details>
+
+            <details class="semestre-block" open>
+                <summary class="semestre-summary" style="color: #30D158 !important;">
+                    Grafos de Dependencias Visuales
+                </summary>
+                <div style="padding: 15px;" id="grafoMermaidContainer">
+                    <p style="color:var(--text-muted); margin-top:10px;">Añade materias con prerrequisitos para visualizar los grafos separados.</p>
+                </div>
+            </details>
+        </div>
+

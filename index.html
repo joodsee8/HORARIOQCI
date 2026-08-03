@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horario QCI</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- loader.js va ANTES que app.js: los <script defer> se ejecutan
+         en el orden en que aparecen, así que primero se arma todo el
+         HTML y luego corre app.js con el DOM ya completo. -->
+    <script src="loader.js" defer></script>
+
+    <!-- app.js seccionado: el orden importa, deben ir siempre en este orden -->
+    <script src="js/01-variables.js" defer></script>
+    <script src="js/02-inicio.js" defer></script>
+    <script src="js/03-navegacion.js" defer></script>
+    <script src="js/04-catalogos.js" defer></script>
+    <script src="js/05-materias-malla.js" defer></script>
+    <script src="js/06-renderizado.js" defer></script>
+    <script src="js/07-respaldos.js" defer></script>
+    <script src="js/08-siiau-horarios.js" defer></script>
+    <script src="js/09-generador.js" defer></script>
+    <script src="js/10-dashboard.js" defer></script>
+    <script src="js/11-sync-mongodb.js" defer></script>
+    <script src="js/12-ux.js" defer></script>
+</head>
+<body>
+
+    <div data-include="partials/nav.html"></div>
+
+    <div class="container">
+        <div data-include="partials/form-page.html"></div>
+        <div data-include="partials/list-page.html"></div>
+        <div data-include="partials/grid-page.html"></div>
+        <div data-include="partials/horario-page.html"></div>
+        <div data-include="partials/generador-page.html"></div>
+        <div data-include="partials/dashboard-page.html"></div>
+        <div data-include="partials/social-page.html"></div>
+        <div data-include="partials/practicas-page.html"></div>
+    </div>
+
+    <div data-include="partials/sync-panel.html"></div>
+
+</body>
+</html>
