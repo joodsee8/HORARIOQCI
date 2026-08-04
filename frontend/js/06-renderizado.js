@@ -189,3 +189,30 @@ function exportarPDF() {
     }, 100); 
 }
 
+// --- Exportar NRC a .txt (compatible con la extensión "SIIAU Registrador de NRC") ---
+// Formato esperado por la extensión: un NRC por línea, sin encabezados, máx. 10.
+function descargarTxtDeNrcs(nrcs, nombreArchivo = 'NRC.txt') {
+    if (!nrcs || nrcs.length === 0) { alert('No hay NRC para exportar.'); return; }
+
+    let lista = nrcs;
+    if (nrcs.length > 10) {
+        alert(`El SIIAU solo permite capturar hasta 10 NRC a la vez. Se exportarán solo los primeros 10 de los ${nrcs.length} que hay aquí; el resto regístralo en una segunda tanda.`);
+        lista = nrcs.slice(0, 10);
+    }
+
+    const contenido = lista.join('\n');
+    const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombreArchivo;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Exporta el horario que tienes armado ahora mismo (horario-page).
+function exportarNrcTxt() {
+    descargarTxtDeNrcs(horarioActual, 'NRC.txt');
+}

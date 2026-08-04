@@ -321,9 +321,12 @@ function cuerpoTarjeta(uid) {
     htmlList += '</ul>';
 
     let jsonArr = JSON.stringify(res);
-    return `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+    return `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
             <h4 style="margin:0; border:none; font-size:14px;">Opción #${index + 1} <span style="font-size:10px; opacity:0.6;">(${tag})</span></h4>
-            <button class="btn-submit" style="background:rgba(48, 209, 88, 0.2) !important; color:#30D158 !important; border:1px solid rgba(48, 209, 88, 0.4); padding:6px 12px; font-size:12px;" onclick='aplicarHorarioGenerado(${jsonArr})'>Aplicar</button>
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+                <button type="button" title="Exportar NRC a TXT (para el Registrador)" style="background:rgba(10,132,255,0.15); color:#0A84FF; border:1px solid rgba(10,132,255,0.4); border-radius:8px; padding:6px 10px; font-size:12px; cursor:pointer;" onclick='descargarTxtDeNrcs(${jsonArr}, "NRC_opcion${index + 1}.txt")'>📥 TXT</button>
+                <button class="btn-submit" style="background:rgba(48, 209, 88, 0.2) !important; color:#30D158 !important; border:1px solid rgba(48, 209, 88, 0.4); padding:6px 12px; font-size:12px;" onclick='aplicarHorarioGenerado(${jsonArr})'>Aplicar</button>
+            </div>
         </div>
         <div style="font-size:11px; margin-bottom:10px;"><span style="color:#FFD60A; margin-right:10px; font-weight:bold;">⭐ Favoritos: ${scoreFav}</span><span style="color:#64D2FF; font-weight:bold;">⚡ Eficiencia: ${scoreEfi}</span></div>
         <div class="mini-cal">${dibujarMiniCalendario(res)}</div>${htmlList}`;

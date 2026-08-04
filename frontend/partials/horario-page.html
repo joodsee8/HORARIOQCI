@@ -1,4 +1,4 @@
-        <div id="horario-page" class="page">
+<div id="horario-page" class="page">
             <div class="page-header">
                 <h2>Armador de Horarios por Semestre</h2>
             </div>
@@ -30,11 +30,7 @@
                     </select>
                     
                     <!-- 3. Carrera Libre -->
-                    <select id="apiCarrera">
-                        <option value="">Selecciona tu carrera</option>
-                        <option value="INQU">Ingeniería Química</option>
-                        <option value="INDU">Ingeniería Industrial</option>
-                    </select>
+                    <input type="text" id="apiCarrera" value="" placeholder="Carrera">
                     
                     <button class="btn-submit" onclick="descargarOfertaAPI()">Extraer Oferta</button>
                 </div>
@@ -51,6 +47,8 @@
             </div>
 
             <div class="calendario-container" id="gridCalendario"></div>
-            <button class="btn-pdf" onclick="limpiarHorario()" style="margin-top: 15px; background: rgba(255, 69, 58, 0.2); color: #FF453A; border: 1px solid rgba(255, 69, 58, 0.4);">Borrar Horario Actual</button>
+            <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+                <button class="btn-submit" onclick="exportarNrcTxt()" style="background:rgba(10,132,255,0.2) !important; color:#0A84FF !important; border:1px solid rgba(10,132,255,0.4); max-width:220px;">📥 Exportar NRC a TXT</button>
+                <button class="btn-pdf" onclick="limpiarHorario()" style="background: rgba(255, 69, 58, 0.2); color: #FF453A; border: 1px solid rgba(255, 69, 58, 0.4);">Borrar Horario Actual</button>
+            </div>
         </div>
-
