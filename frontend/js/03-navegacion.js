@@ -32,23 +32,12 @@ function hexToRgba(hex, alpha) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-const btn = document.querySelector(".theme-toggle");
-
-const temaGuardado = localStorage.getItem("theme");
-
-if(temaGuardado==="light"){
-    document.body.classList.add("light-theme");
+// Función para alternar el tema
+function toggleTheme() {
+    const root = document.documentElement; // o document.body
+    if (root.getAttribute('data-theme') === 'light') {
+        root.removeAttribute('data-theme');
+    } else {
+        root.setAttribute('data-theme', 'light');
+    }
 }
-
-btn?.addEventListener("click",()=>{
-
-    document.body.classList.toggle("light-theme");
-
-    localStorage.setItem(
-        "theme",
-        document.body.classList.contains("light-theme")
-            ? "light"
-            : "dark"
-    );
-
-});
