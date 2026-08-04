@@ -32,3 +32,23 @@ function hexToRgba(hex, alpha) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+const btn = document.querySelector(".theme-toggle");
+
+const temaGuardado = localStorage.getItem("theme");
+
+if(temaGuardado==="light"){
+    document.body.classList.add("light-theme");
+}
+
+btn?.addEventListener("click",()=>{
+
+    document.body.classList.toggle("light-theme");
+
+    localStorage.setItem(
+        "theme",
+        document.body.classList.contains("light-theme")
+            ? "light"
+            : "dark"
+    );
+
+});
