@@ -1,11 +1,11 @@
 /* =========================================================
    APPLE "LIQUID GLASS" DYNAMIC THEME (DARK / TRUE LIGHT)
-   Rediseñado para máxima coherencia visual y física
+   Versión de Alto Contraste y Definición
 ========================================================= */
 
 :root {
     /* =========================================
-       MODO OSCURO (Vibrante y Profundo)
+       MODO OSCURO (Vibrante y Profundo - Intacto)
        ========================================= */
     --bg-main: #09090b;
     --bg-grad-1: rgba(94, 92, 230, 0.15);
@@ -20,7 +20,7 @@
     --text-muted: #86868B;
     --text-heading: #ffffff;
     
-    /* Botones Primarios ( Submit / PDF ) */
+    /* Botones Primarios */
     --accent-blue: #0A84FF;
     --accent-purple: #5E5CE6;
     --btn-primary-bg: rgba(10, 132, 255, 0.12);
@@ -30,7 +30,7 @@
     --btn-primary-shadow: 0 4px 12px rgba(0,0,0,0.2);
     --btn-primary-hover: rgba(10, 132, 255, 0.22);
     
-    /* Botones Semánticos (Verde, Rojo, Naranja) */
+    /* Botones Semánticos */
     --btn-green-bg: rgba(48, 209, 88, 0.1);
     --btn-green-text: #30D158;
     --btn-green-border: rgba(48, 209, 88, 0.2);
@@ -96,104 +96,104 @@
 
 [data-theme="light"] {
     /* =========================================
-       MODO CLARO (Luminoso, Limpio y Táctil)
+       MODO CLARO (Alto Contraste y Definición)
        ========================================= */
     
-    /* Fondos - Gris muy suave con destellos pastel */
-    --bg-main: #F2F2F7;
-    --bg-grad-1: rgba(255, 45, 85, 0.05);  /* Destello rosa muy sutil */
-    --bg-grad-2: rgba(0, 122, 255, 0.05);  /* Destello azul muy sutil */
+    /* Fondos - Gris más notable para que el cristal blanco resalte */
+    --bg-main: #E9E9EB; 
+    --bg-grad-1: rgba(255, 45, 85, 0.08); 
+    --bg-grad-2: rgba(0, 122, 255, 0.08); 
     
-    /* Cristal - Blanco, brillante y con borde reflejante */
-    --glass-bg: rgba(255, 255, 255, 0.75);
-    --glass-border: rgba(255, 255, 255, 1); 
-    --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02); /* Sombra elegante */
+    /* Cristal - Blanco casi opaco con un borde oscuro sutil para enmarcar y dar contraste */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(0, 0, 0, 0.12); 
+    --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04); 
     
-    /* Textos - Grises profundos (el negro puro lastima la vista en pantallas claras) */
-    --text-main: #1C1C1E;
-    --text-muted: #8E8E93;
+    /* Textos - Mucho más oscuros para legibilidad perfecta */
+    --text-main: #111111;
+    --text-muted: #55555A;
     --text-heading: #000000;
     
-    /* Botones Primarios - Sólidos y vibrantes para destacar sobre el cristal blanco */
+    /* Botones Primarios - Azules y morados vivos */
     --accent-blue: #007AFF;
     --accent-purple: #5856D6;
     --btn-primary-bg: linear-gradient(135deg, #007AFF, #5856D6);
     --btn-primary-text: #FFFFFF;
     --btn-primary-border: transparent;
-    --btn-primary-border-top: rgba(255, 255, 255, 0.3);
-    --btn-primary-shadow: 0 4px 15px rgba(0, 122, 255, 0.25);
+    --btn-primary-border-top: rgba(255, 255, 255, 0.4);
+    --btn-primary-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
     --btn-primary-hover: linear-gradient(135deg, #006ae6, #4f4dc2);
     
-    /* Botones Semánticos - Fondos pastel sedosos con textos oscuros legibles */
+    /* Botones Semánticos - Bordes y textos más oscuros para máxima claridad */
     --btn-green-bg: rgba(52, 199, 89, 0.15);
-    --btn-green-text: #197831; /* Verde oscuro fuerte */
-    --btn-green-border: rgba(52, 199, 89, 0.3);
+    --btn-green-text: #115F22; /* Verde muy oscuro */
+    --btn-green-border: rgba(52, 199, 89, 0.4);
     
     --btn-red-bg: rgba(255, 59, 48, 0.12);
-    --btn-red-text: #C92A1F; /* Rojo oscuro fuerte */
-    --btn-red-border: rgba(255, 59, 48, 0.25);
+    --btn-red-text: #A31D14; /* Rojo muy oscuro */
+    --btn-red-border: rgba(255, 59, 48, 0.35);
     
     --btn-orange-bg: rgba(255, 149, 0, 0.15);
-    --btn-orange-text: #B25000; /* Naranja/Café oscuro */
-    --btn-orange-border: rgba(255, 149, 0, 0.3);
+    --btn-orange-text: #994500; /* Naranja quemado/café */
+    --btn-orange-border: rgba(255, 149, 0, 0.4);
 
     /* UI Elements */
-    --scroll-thumb: rgba(0,0,0,0.15);
-    --scroll-thumb-hover: rgba(0,0,0,0.25);
+    --scroll-thumb: rgba(0,0,0,0.2);
+    --scroll-thumb-hover: rgba(0,0,0,0.35);
     
-    /* Navbar - Se integra mejor sin parecer un bloque gris */
-    --nav-bg: rgba(255, 255, 255, 0.85);
-    --nav-btn-bg: transparent;
-    --nav-btn-border: transparent;
-    --nav-btn-border-top: transparent;
-    --nav-btn-hover-bg: rgba(0, 0, 0, 0.04);
+    /* Navbar - Ligeramente grisácea para separarse del fondo de la app */
+    --nav-bg: rgba(245, 245, 247, 0.9);
+    --nav-btn-bg: rgba(0, 0, 0, 0.04);
+    --nav-btn-border: rgba(0, 0, 0, 0.06);
+    --nav-btn-border-top: rgba(255, 255, 255, 0.6); /* Reflejo superior */
+    --nav-btn-hover-bg: rgba(0, 0, 0, 0.08);
     --nav-btn-active-bg: #FFFFFF;
-    --nav-btn-active-border: rgba(0, 0, 0, 0.08);
+    --nav-btn-active-border: rgba(0, 0, 0, 0.15);
     --nav-btn-text-hover: #000000;
 
-    /* Inputs - Efecto Inset (hundido) sutil */
-    --input-bg: rgba(0, 0, 0, 0.03);
-    --input-border: rgba(0, 0, 0, 0.06);
-    --input-text: #1C1C1E;
-    --input-focus: rgba(0, 122, 255, 0.4);
-    --select-bg: #FFFFFF;
+    /* Inputs - Profundamente delimitados (cajas grises con borde visible) */
+    --input-bg: rgba(0, 0, 0, 0.05);
+    --input-border: rgba(0, 0, 0, 0.15);
+    --input-text: #111111;
+    --input-focus: rgba(0, 122, 255, 0.5);
+    --select-bg: #F2F2F7;
 
     /* Listas */
-    --item-bg: rgba(255, 255, 255, 0.5);
-    --item-border-bottom: rgba(0, 0, 0, 0.05);
-    --item-hover: rgba(255, 255, 255, 0.9);
+    --item-bg: rgba(255, 255, 255, 0.7);
+    --item-border-bottom: rgba(0, 0, 0, 0.1);
+    --item-hover: rgba(255, 255, 255, 1);
 
-    /* Malla - El fondo del grid es más tenue */
-    --malla-cell-bg: rgba(0, 0, 0, 0.015);
-    --malla-cell-border: rgba(0, 0, 0, 0.05);
+    /* Malla - El fondo de la celda es más oscuro para que la tarjeta de la materia destaque */
+    --malla-cell-bg: rgba(0, 0, 0, 0.04);
+    --malla-cell-border: rgba(0, 0, 0, 0.12);
     
-    /* Materias - Tarjetas nítidas, sin sombras oscuras de texto */
-    --malla-materia-text: #1C1C1E;
-    --malla-materia-border: rgba(0, 0, 0, 0.08);
-    --malla-materia-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    --malla-materia-text-shadow: none; /* Vital para que se vea limpio */
-    --malla-materia-hover-border: rgba(0, 122, 255, 0.3);
-    --malla-materia-hover-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    --materia-nrc-text: #8E8E93;
-    --malla-bar-bg: linear-gradient(135deg, #34C759, #2FB851);
+    /* Materias - Bordes muy definidos */
+    --malla-materia-text: #000000;
+    --malla-materia-border: rgba(0, 0, 0, 0.15);
+    --malla-materia-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    --malla-materia-text-shadow: none; 
+    --malla-materia-hover-border: rgba(0, 122, 255, 0.5);
+    --malla-materia-hover-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    --materia-nrc-text: #55555A;
+    --malla-bar-bg: linear-gradient(135deg, #34C759, #28A745);
     --malla-bar-text: white;
     
     /* Badges */
-    --badge-bg: rgba(0, 0, 0, 0.06);
-    --badge-text: #1C1C1E;
-    --badge-border: rgba(0, 0, 0, 0.04);
+    --badge-bg: rgba(0, 0, 0, 0.08);
+    --badge-text: #111111;
+    --badge-border: rgba(0, 0, 0, 0.12);
     
-    /* Calendario */
-    --cal-grid-bg: rgba(255, 255, 255, 0.5);
-    --cal-header-bg: rgba(0, 0, 0, 0.03);
-    --cal-hora-bg: rgba(0, 0, 0, 0.02);
-    --cal-celda-border: rgba(0, 0, 0, 0.04);
+    /* Calendario - Grid bien definido */
+    --cal-grid-bg: rgba(255, 255, 255, 0.6);
+    --cal-header-bg: rgba(0, 0, 0, 0.06);
+    --cal-hora-bg: rgba(0, 0, 0, 0.04);
+    --cal-celda-border: rgba(0, 0, 0, 0.08);
     
-    --mermaid-bg: rgba(255, 255, 255, 0.9);
-    --hamburger-hover: rgba(0, 0, 0, 0.05);
+    --mermaid-bg: rgba(255, 255, 255, 0.95);
+    --hamburger-hover: rgba(0, 0, 0, 0.08);
 
-    --shadow-sm: 0 2px 6px rgba(0,0,0,0.04);
-    --shadow-sm-active: 0 1px 2px rgba(0,0,0,0.02);
+    --shadow-sm: 0 2px 6px rgba(0,0,0,0.06);
+    --shadow-sm-active: 0 1px 2px rgba(0,0,0,0.03);
 }
 
 * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -276,7 +276,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-blue) !im
 select option { background: var(--select-bg); color: var(--input-text); } 
 .catalogo-section summary { font-size: 13px; color: var(--accent-blue); cursor: pointer; font-weight: 500; }
 
-/* Botones Principales y Semánticos Completamente Dinámicos */
+/* Botones Principales y Semánticos */
 .btn-submit, .btn-pdf { 
     background: var(--btn-primary-bg) !important; color: var(--btn-primary-text) !important; border: 1px solid var(--btn-primary-border) !important; border-top: 1px solid var(--btn-primary-border-top) !important;
     border-radius: 12px !important; font-weight: 600; font-size: 14px; padding: 12px 18px; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
@@ -287,8 +287,7 @@ select option { background: var(--select-bg); color: var(--input-text); }
 
 #btnCancelar, .btn-eliminar { 
     background: var(--btn-red-bg) !important; color: var(--btn-red-text) !important; 
-    border: 1px solid var(--btn-red-border) !important; border-top-color: var(--btn-red-border) !important; 
-    box-shadow: none; 
+    border: 1px solid var(--btn-red-border) !important; border-top-color: var(--btn-red-border) !important; box-shadow: none; 
 }
 .btn-cargar, .btn-editar { 
     background: var(--btn-orange-bg) !important; color: var(--btn-orange-text) !important; 
@@ -351,12 +350,8 @@ summary.semestre-summary { background: transparent !important; padding: 15px; fo
    CALENDARIOS Y GENERADORES 
 ========================================================= */
 .calendario-container { 
-    display: grid; 
-    grid-template-columns: 60px repeat(6, minmax(0, 1fr)); 
-    grid-template-rows: 40px repeat(15, 60px); 
-    gap: 1px; 
-    background: var(--cal-grid-bg); 
-    border: 1px solid var(--glass-border); 
+    display: grid; grid-template-columns: 60px repeat(6, minmax(0, 1fr)); grid-template-rows: 40px repeat(15, 60px); 
+    gap: 1px; background: var(--cal-grid-bg); border: 1px solid var(--glass-border); 
     border-radius: 12px; margin-top: 20px; position: relative; overflow: hidden;
 }
 
