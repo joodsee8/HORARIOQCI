@@ -47,7 +47,7 @@ function generarCatalogoDesdeOferta() {
     document.getElementById('jsonCatalogo').value = JSON.stringify(nuevoCatalogo, null, 2);
     document.getElementById('jsonCatalogo').disabled = false;
     cargarDatalist();
-    alert(`¡PUM! 💥 Catálogo auto-generado con ${Object.keys(nuevoCatalogo).length} materias únicas.`);
+    alert(`Catálogo auto-generado con ${Object.keys(nuevoCatalogo).length} materias.`);
 }
 
 function cargarDatalist() {
