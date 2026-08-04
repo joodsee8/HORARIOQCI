@@ -201,128 +201,27 @@ async function ejecutarGenerador() {
         return alert(`Imposible agendar:\n"${errorFaltaOferta}"\nTodos sus profes están vetados o no encajan en tus horas.`);
     }
 
-const chkCupos = document.getElementById('chkCuposEnVivo');
+    const chkCupos = document.getElementById('chkCuposEnVivo');
+    if (chkCupos && chkCupos.checked) {
+        if(btn) btn.innerHTML = 'Consultando SIIAU en vivo... ⏳';
+        let minCupos = parseInt(document.getElementById('minCuposVal').value) || 1;
+        let nrcsAProbar = gruposMaterias.flat(); 
 
-if (chkCupos && chkCupos.checked) {
+        try {
+            const dictCupos = await consultarCuposEnVivo(nrcsAProbar);
 
-    // Tomamos primero la carrera del calendario
-    let carrera = document
-        .getElementById('apiCarrera')
-        ?.value
-        .trim()
-        .toUpperCase() || '';
-
-    // Si el calendario no tiene carrera,
-    // usamos la carrera elegida en el nuevo select
-    if (!carrera) {
-        carrera = document
-            .getElementById('carreraCupos')
-            ?.value
-            .trim()
-            .toUpperCase() || '';
-    }
-
-    // Si no hay carrera en ninguno de los dos,
-    // detenemos el proceso antes de consultar SIIAU
-    if (!carrera) {
-        if (btn) {
-            btn.innerHTML = 'Generar Opciones';
-            btn.disabled = false;
-        }
-
-        return alert(
-            '🎓 Selecciona una carrera para consultar los cupos en vivo.'
-        );
-    }
-
-    // Guardamos la carrera seleccionada en apiCarrera
-    // para que consultarCuposEnVivo() la pueda usar
-    const apiCarrera =
-        document.getElementById('apiCarrera');
-
-    if (apiCarrera) {
-        apiCarrera.value = carrera;
-    }
-
-    // Ahora sí consultamos SIIAU
-    if (btn) {
-        btn.innerHTML =
-            'Consultando SIIAU en vivo... ⏳';
-    }
-
-    const minCupos =
-        parseInt(
-            document
-                .getElementById('minCuposVal')
-                ?.value
-        ) || 1;
-
-    const nrcsAProbar =
-        gruposMaterias.flat();
-
-    try {
-
-        const dictCupos =
-            await consultarCuposEnVivo(
-                nrcsAProbar
-            );
-
-        for (
-            let i = 0;
-            i < gruposMaterias.length;
-            i++
-        ) {
-
-            gruposMaterias[i] =
-                gruposMaterias[i].filter(
-                    nrc =>
-                        (
-                            dictCupos[nrc]
-                                ?.disponibles || 0
-                        ) >= minCupos
-                );
-
-            if (
-                gruposMaterias[i].length === 0
-            ) {
-
-                if (btn) {
-                    btn.innerHTML =
-                        'Generar Opciones';
-
-                    btn.disabled = false;
+            for (let i = 0; i < gruposMaterias.length; i++) {
+                gruposMaterias[i] = gruposMaterias[i].filter(nrc => ((dictCupos[nrc] && dictCupos[nrc].disponibles) || 0) >= minCupos);
+                if (gruposMaterias[i].length === 0) {
+                    if(btn) { btn.innerHTML = 'Generar Opciones'; btn.disabled = false; }
+                    return alert(`Sold Out 💀:\n"${cursosGenerador[i].nombre}"\nNingún grupo disponible tiene ${minCupos} cupo(s) en este momento.`);
                 }
-
-                return alert(
-                    `Sold Out 💀:\n` +
-                    `"${cursosGenerador[i].nombre}"\n` +
-                    `Ningún grupo disponible tiene ` +
-                    `${minCupos} cupo(s) ` +
-                    `en este momento.`
-                );
             }
+        } catch (error) {
+            if(btn) { btn.innerHTML = 'Generar Opciones'; btn.disabled = false; }
+            return alert("⚠️ Error al conectar con el backend para checar cupos. Revisa tu terminal.");
         }
-
-    } catch (error) {
-
-        console.error(
-            '❌ Error consultando cupos:',
-            error
-        );
-
-        if (btn) {
-            btn.innerHTML =
-                'Generar Opciones';
-
-            btn.disabled = false;
-        }
-
-        return alert(
-            '⚠️ Error al conectar con el backend ' +
-            'para checar cupos.'
-        );
     }
-}
 
     if(btn) btn.innerHTML = 'Armando combinaciones masivas...';
 
@@ -521,7 +420,7 @@ async function abrirSelectorMaestro(uid, posicion, claveMateria) {
     const state = window.cardState[uid];
     if (!state) return;
     const nrcActual = state.nrcs[posicion];
-    let candidatos = Object.keys(ofertaAcademica).filter(k => ofertaAcademica[k].clave === claveMateria);
+    const candidatosDirectos = Object.keys(ofertaAcademica).filter(k => ofertaAcademica[k].clave === claveMateria);
 
     cerrarModalMaestro();
     const overlay = document.createElement('div');
@@ -541,53 +440,151 @@ async function abrirSelectorMaestro(uid, posicion, claveMateria) {
         </div>`;
     document.body.appendChild(overlay);
 
+    // 1) Separar candidatos directos: los que NO chocan con nada más de la opción,
+    //    y los que sí chocan con alguna(s) otra(s) materia(s).
+    const otrasMateriasFijas = state.nrcs.filter((_, i) => i !== posicion);
+    let sinChoque = [];
+    let conChoque = [];
+    candidatosDirectos.forEach(nrc => {
+        if (nrc === nrcActual || !choca(ofertaAcademica[nrc], otrasMateriasFijas)) sinChoque.push(nrc);
+        else conChoque.push(nrc);
+    });
+
+    // 2) Para cada candidato con choque, buscar si hay forma de reacomodar la(s)
+    //    materia(s) afectada(s) con otro grupo de la MISMA materia que no choque
+    //    con nada (respetando el veto y las restricciones de horario del generador).
+    let poolsPorConflicto = {}; // nrc -> [{ posReal, pool: [nrcsAlternativos] }]
+    let universoCupos = new Set(candidatosDirectos);
+
+    conChoque.forEach(nrc => {
+        const conflictos = [];
+        let posible = true;
+        state.nrcs.forEach((nrcOtra, idxReal) => {
+            if (idxReal === posicion) return;
+            if (choca(ofertaAcademica[nrc], [nrcOtra])) {
+                const clave = ofertaAcademica[nrcOtra].clave;
+                const pool = Object.keys(ofertaAcademica)
+                    .filter(k => k !== nrcOtra && ofertaAcademica[k].clave === clave)
+                    .filter(k => respetaRestricciones(ofertaAcademica[k], window.prefsGeneradorGlobal || { vetados: [], limites: {} }));
+                if (pool.length === 0) { posible = false; return; }
+                pool.forEach(p => universoCupos.add(p));
+                conflictos.push({ posReal: idxReal, pool });
+            }
+        });
+        if (posible) poolsPorConflicto[nrc] = conflictos;
+    });
+
+    // 3) Si "Cupos en Vivo" está activo, consultamos TODO el universo de NRCs
+    //    involucrados (directos + posibles reemplazos) en una sola llamada al backend.
     const chkCupos = document.getElementById('chkCuposEnVivo');
     const usarCuposEnVivo = !!(chkCupos && chkCupos.checked);
+    const minCupos = parseInt(document.getElementById('minCuposVal')?.value) || 1;
     let mapaCupos = null;
 
     if (usarCuposEnVivo) {
         try {
-            mapaCupos = await consultarCuposEnVivo(candidatos);
-            let minCupos = parseInt(document.getElementById('minCuposVal')?.value) || 1;
-            candidatos = candidatos.filter(nrc => nrc === nrcActual || ((mapaCupos[nrc] && mapaCupos[nrc].disponibles) || 0) >= minCupos);
+            mapaCupos = await consultarCuposEnVivo(Array.from(universoCupos));
         } catch (e) {
             const aviso = document.getElementById('listaMaestrosModal');
             if (aviso) aviso.innerHTML = `<p style="color:#FF9F0A; font-size:12px; text-align:center; padding:10px 0;">⚠️ No se pudo verificar cupos en vivo. Mostrando todas las opciones.</p>`;
-            mapaCupos = null;
         }
     }
 
-    // El modal pudo haberse cerrado mientras esperábamos la respuesta del backend
     const contenedor = document.getElementById('listaMaestrosModal');
-    if (!contenedor) return;
+    if (!contenedor) return; // el modal se pudo haber cerrado mientras esperábamos
 
-    if (candidatos.length === 0) {
-        contenedor.innerHTML = `<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:20px 0;">No hay otras opciones disponibles${usarCuposEnVivo ? ' con cupo' : ''}.</p>`;
-        return;
+    if (mapaCupos) {
+        sinChoque = sinChoque.filter(nrc => nrc === nrcActual || ((mapaCupos[nrc] && mapaCupos[nrc].disponibles) || 0) >= minCupos);
     }
 
-    let html = '';
-    candidatos.forEach(nrc => {
-        const curso = ofertaAcademica[nrc];
-        const esActual = nrc === nrcActual;
-        const dias = formatearHorariosMaestro(curso.horarios);
-        let badgeCupos = '';
-        if (mapaCupos && mapaCupos[nrc]) {
-            const dis = mapaCupos[nrc].disponibles;
-            const color = dis > 0 ? '#30D158' : '#FF453A';
-            badgeCupos = `<div style="margin-top:6px; font-size:11px; font-weight:bold; color:${color};">🟢 ${dis} cupo(s) disponibles</div>`;
+    // 4) Con los cupos ya conocidos, resolver el reacomodo de cada candidato con choque
+    //    (búsqueda voraz: fija el candidato nuevo + lo que no choca, y va acomodando
+    //    una por una las materias en conflicto contra ese set ya fijado).
+    const favoritos = (window.prefsGeneradorGlobal && window.prefsGeneradorGlobal.favoritos) || [];
+    let reacomodos = []; // { nrc, cambios: [{ posReal, nrcNuevo }] }
+
+    conChoque.forEach(nrc => {
+        if (!poolsPorConflicto[nrc]) return; // ya se descartó: ninguna alternativa posible
+        if (mapaCupos && ((mapaCupos[nrc] && mapaCupos[nrc].disponibles) || 0) < minCupos) return; // el candidato mismo no tiene cupo
+
+        const posicionesEnConflicto = poolsPorConflicto[nrc].map(c => c.posReal);
+        let fijos = [nrc, ...state.nrcs.filter((_, i) => i !== posicion && !posicionesEnConflicto.includes(i))];
+
+        const cambios = [];
+        let ok = true;
+
+        for (const conflicto of poolsPorConflicto[nrc]) {
+            let opciones = conflicto.pool.filter(k => !choca(ofertaAcademica[k], fijos));
+            if (mapaCupos) opciones = opciones.filter(k => ((mapaCupos[k] && mapaCupos[k].disponibles) || 0) >= minCupos);
+            if (opciones.length === 0) { ok = false; break; }
+
+            // Preferimos, si hay favoritos marcados, mandar primero al profe favorito
+            opciones.sort((a, b) => {
+                const favA = favoritos.includes((ofertaAcademica[a].profesor || '').trim()) ? 1 : 0;
+                const favB = favoritos.includes((ofertaAcademica[b].profesor || '').trim()) ? 1 : 0;
+                return favB - favA;
+            });
+
+            const elegido = opciones[0];
+            fijos.push(elegido);
+            cambios.push({ posReal: conflicto.posReal, nrcNuevo: elegido });
         }
-        html += `<div onclick="seleccionarNuevoMaestro('${uid}', ${posicion}, '${nrc}')" style="padding:12px; margin-bottom:8px; border-radius:12px; cursor:pointer; background:${esActual ? 'rgba(10,132,255,0.15)' : 'rgba(255,255,255,0.04)'}; border:1px solid ${esActual ? 'rgba(10,132,255,0.5)' : 'rgba(255,255,255,0.08)'};">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                <strong style="font-size:13px; color:#fff;">Maestro: ${curso.profesor || 'Por definir'}</strong>
-                ${esActual ? '<span style="font-size:10px; color:#0A84FF; font-weight:bold; flex-shrink:0;">ACTUAL</span>' : ''}
-            </div>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Días: ${dias}</div>
-            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">NRC: ${nrc}</div>
-            ${badgeCupos}
-        </div>`;
+
+        if (ok) reacomodos.push({ nrc, cambios });
     });
-    contenedor.innerHTML = html;
+
+    contenedor.innerHTML = construirListaModal(uid, posicion, nrcActual, sinChoque, reacomodos, mapaCupos, usarCuposEnVivo);
+}
+
+// Pinta las dos secciones del modal: sin choques primero, con reacomodo después.
+function construirListaModal(uid, posicion, nrcActual, sinChoque, reacomodos, mapaCupos, usarCuposEnVivo) {
+    window.reacomodosTemp = reacomodos; // se lee por índice desde aplicarReacomodo()
+
+    let html = `<div style="font-size:11px; font-weight:bold; color:#30D158; text-transform:uppercase; letter-spacing:0.5px; margin:4px 0 8px;">✅ Disponibles sin mover nada</div>`;
+    if (sinChoque.length === 0) {
+        html += `<p style="color:var(--text-muted); font-size:12px; padding:4px 0 14px;">Ninguno sin conflicto${usarCuposEnVivo ? ' (o sin cupo)' : ''}.</p>`;
+    } else {
+        sinChoque.forEach(nrc => {
+            html += filaMaestro(nrc, nrcActual, mapaCupos, `onclick="seleccionarNuevoMaestro('${uid}', ${posicion}, '${nrc}')"`);
+        });
+    }
+
+    html += `<div style="font-size:11px; font-weight:bold; color:#FF9F0A; text-transform:uppercase; letter-spacing:0.5px; margin:16px 0 8px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);">🔄 Requieren reacomodar otra materia</div>`;
+    if (reacomodos.length === 0) {
+        html += `<p style="color:var(--text-muted); font-size:12px; padding:4px 0;">No hay forma de reacomodar ningún otro grupo sin chocar (o sus reemplazos están vetados o sin cupo).</p>`;
+    } else {
+        reacomodos.forEach((r, idx) => {
+            const detalleCambios = r.cambios.map(c => {
+                const m = ofertaAcademica[c.nrcNuevo];
+                return `<div style="font-size:10.5px; color:#FF9F0A; margin-top:4px;">↳ Mueve <strong>${m.materia}</strong> a Prof: ${m.profesor || 'Por definir'} (${formatearHorariosMaestro(m.horarios)})</div>`;
+            }).join('');
+            html += filaMaestro(r.nrc, nrcActual, mapaCupos, `onclick="aplicarReacomodo('${uid}', ${posicion}, ${idx})"`, detalleCambios);
+        });
+    }
+
+    return html;
+}
+
+// Fila reutilizable de "maestro/horario" dentro del modal.
+function filaMaestro(nrc, nrcActual, mapaCupos, onclickAttr, extraHtml) {
+    const curso = ofertaAcademica[nrc];
+    const esActual = nrc === nrcActual;
+    const dias = formatearHorariosMaestro(curso.horarios);
+    let badgeCupos = '';
+    if (mapaCupos && mapaCupos[nrc]) {
+        const dis = mapaCupos[nrc].disponibles;
+        const color = dis > 0 ? '#30D158' : '#FF453A';
+        badgeCupos = `<div style="margin-top:6px; font-size:11px; font-weight:bold; color:${color};">🟢 ${dis} cupo(s) disponibles</div>`;
+    }
+    return `<div ${onclickAttr} style="padding:12px; margin-bottom:8px; border-radius:12px; cursor:pointer; background:${esActual ? 'rgba(10,132,255,0.15)' : 'rgba(255,255,255,0.04)'}; border:1px solid ${esActual ? 'rgba(10,132,255,0.5)' : 'rgba(255,255,255,0.08)'};">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <strong style="font-size:13px; color:#fff;">Maestro: ${curso.profesor || 'Por definir'}</strong>
+            ${esActual ? '<span style="font-size:10px; color:#0A84FF; font-weight:bold; flex-shrink:0;">ACTUAL</span>' : ''}
+        </div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Días: ${dias}</div>
+        <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">NRC: ${nrc}</div>
+        ${badgeCupos}${extraHtml || ''}
+    </div>`;
 }
 
 function cerrarModalMaestro() {
@@ -595,9 +592,8 @@ function cerrarModalMaestro() {
     if (overlay) overlay.remove();
 }
 
-// Reemplaza el NRC de esa materia SOLO dentro de esta opción generada,
-// valida que no choque con las demás materias de la misma opción, y
-// vuelve a dibujar nada más esa tarjeta.
+// Reemplaza el NRC de esa materia SOLO dentro de esta opción generada (caso "sin choque"),
+// y vuelve a dibujar nada más esa tarjeta.
 function seleccionarNuevoMaestro(uid, posicion, nuevoNrc) {
     const state = window.cardState[uid];
     if (!state) return;
@@ -610,6 +606,20 @@ function seleccionarNuevoMaestro(uid, posicion, nuevoNrc) {
     }
 
     state.nrcs[posicion] = nuevoNrc;
+    cerrarModalMaestro();
+    renderizarTarjeta(uid);
+}
+
+// Aplica un reacomodo completo: cambia el NRC elegido en "posicion" Y los NRCs
+// de la(s) materia(s) que había que mover para que dejaran de chocar.
+function aplicarReacomodo(uid, posicion, idx) {
+    const state = window.cardState[uid];
+    const reacomodo = window.reacomodosTemp && window.reacomodosTemp[idx];
+    if (!state || !reacomodo) return;
+
+    state.nrcs[posicion] = reacomodo.nrc;
+    reacomodo.cambios.forEach(c => { state.nrcs[c.posReal] = c.nrcNuevo; });
+
     cerrarModalMaestro();
     renderizarTarjeta(uid);
 }
