@@ -32,7 +32,7 @@ function hexToRgba(hex, alpha) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-<script>
+
 function toggleTheme() {
     const root = document.documentElement; // Hace referencia a la etiqueta <html>
     const btn = document.getElementById('btn-theme');
@@ -48,5 +48,5 @@ function toggleTheme() {
         btn.innerHTML = '🌙 Modo Oscuro'; // Cambia el texto del botón
     }
 }
-</script>
+
 
