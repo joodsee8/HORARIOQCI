@@ -32,12 +32,21 @@ function hexToRgba(hex, alpha) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-// Función para alternar el tema
+<script>
 function toggleTheme() {
-    const root = document.documentElement; // o document.body
+    const root = document.documentElement; // Hace referencia a la etiqueta <html>
+    const btn = document.getElementById('btn-theme');
+
+    // Si el tema actual es claro, lo quitamos (regresa al oscuro por defecto)
     if (root.getAttribute('data-theme') === 'light') {
         root.removeAttribute('data-theme');
-    } else {
+        btn.innerHTML = '🌞 Modo Claro'; // Cambia el texto del botón
+    } 
+    // Si no tiene el tema claro, se lo agregamos
+    else {
         root.setAttribute('data-theme', 'light');
+        btn.innerHTML = '🌙 Modo Oscuro'; // Cambia el texto del botón
     }
 }
+</script>
+
