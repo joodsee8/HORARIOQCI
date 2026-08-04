@@ -32,12 +32,3 @@ function hexToRgba(hex, alpha) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-// Función para alternar el tema
-function toggleTheme() {
-    const root = document.documentElement; // o document.body
-    if (root.getAttribute('data-theme') === 'light') {
-        root.removeAttribute('data-theme');
-    } else {
-        root.setAttribute('data-theme', 'light');
-    }
-}
