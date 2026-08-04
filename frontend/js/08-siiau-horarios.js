@@ -11,7 +11,7 @@ async function descargarOfertaAPI() {
     estado.style.color = "#FF9F0A"; estado.innerText = "Conectando al servidor y extrayendo datos del SIIAU... ⏳";
 
     try {
-        const respuesta = await fetch('https://horarioqci.onrender.com/api/extraer-oferta', {
+        const respuesta = await fetch('https://generador-horarios-cucei.onrender.com/api/extraer-oferta', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ciclo, centro, carrera })
@@ -105,73 +105,80 @@ function reubicarMateriaInteligente(claveOriginal, nrcIgnorar) {
 // Recibe un arreglo de NRCs (strings) y regresa un objeto:
 // { "42298": { cupos: 40, disponibles: 39 }, "42295": { cupos: 20, disponibles: 20 }, ... }
 async function consultarCuposEnVivo(nrcs) {
-    const ciclo =
-        document.getElementById('apiCiclo')
-            ? document.getElementById('apiCiclo').value
-            : '';
+    const ciclo = document.getElementById('apiCiclo') ? document.getElementById('apiCiclo').value : '';
+    const centro = document.getElementById('apiCentro') ? document.getElementById('apiCentro').value : '';
+    let carrera = document.getElementById('apiCarrera') ? document.getElementById('apiCarrera').value.trim().toUpperCase() : '';
 
-    const centro =
-        document.getElementById('apiCentro')
-            ? document.getElementById('apiCentro').value
-            : '';
-
-    const carrera =
-        document.getElementById('apiCarrera')
-            ? document
-                .getElementById('apiCarrera')
-                .value
-                .trim()
-                .toUpperCase()
-            : '';
-
-    console.log('📤 Enviando consulta de cupos:', {
-        nrcs,
-        ciclo,
-        centro,
-        carrera
-    });
-
-    const respuesta = await fetch(
-        'https://horarioqci.onrender.com/api/consultar-cupos',
-        {
-            method: 'POST',
-
-            headers: {
-                'Content-Type': 'application/json'
-            },
-
-            body: JSON.stringify({
-                nrcs,
-                ciclo,
-                centro,
-                carrera
-            })
-        }
-    );
-
-    // Leemos el texto antes de lanzar el error
-    const textoRespuesta =
-        await respuesta.text();
-
-    console.log(
-        '📥 Estado HTTP:',
-        respuesta.status
-    );
-
-    console.log(
-        '📥 Respuesta del backend:',
-        textoRespuesta
-    );
-
-    if (!respuesta.ok) {
-        throw new Error(
-            `Error HTTP ${respuesta.status}: ` +
-            textoRespuesta
-        );
+    // Si falta la carrera (el campo apiCarrera está vacío), en vez de tronar el
+    // request directo, pedimos la carrera con una ventana flotante y seguimos
+    // con la consulta en cuanto el usuario elige una.
+    if (!carrera) {
+        carrera = await pedirCarrera();
+        const campo = document.getElementById('apiCarrera');
+        if (campo) campo.value = carrera; // se queda guardado para las próximas consultas
     }
 
-    // Convertimos el texto a JSON
-    return JSON.parse(textoRespuesta);
+    const respuesta = await fetch('https://generador-horarios-cucei.onrender.com/api/consultar-cupos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nrcs, ciclo, centro, carrera })
+    });
+    if (!respuesta.ok) throw new Error("Error consultando cupos en el backend");
+    return await respuesta.json();
+}
+
+// Ventana flotante para elegir la carrera cuando falta. Se resuelve con el
+// id de la carrera elegida (ej. "INQU"); si el usuario la cierra sin elegir,
+// rechaza la promesa (quien llamó a consultarCuposEnVivo debe manejar ese error).
+const CARRERAS_DISPONIBLES = [
+    { id: 'INQU', nombre: 'Ingeniería Química' },
+    { id: 'INDU', nombre: 'Ingeniería Industrial' }
+];
+
+function pedirCarrera() {
+    return new Promise((resolve, reject) => {
+        cerrarModalCarrera();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'modalCarreraOverlay';
+        overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px;';
+        overlay.onclick = (e) => {
+            if (e.target !== overlay) return;
+            cerrarModalCarrera();
+            reject(new Error('Selección de carrera cancelada'));
+        };
+
+        overlay.innerHTML = `
+            <div style="width:100%; max-width:380px; background:#1c1c1e; border-radius:20px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,0.5); max-height:85vh; display:flex; flex-direction:column;">
+                <div style="padding:18px 20px 6px; flex-shrink:0;">
+                    <h3 style="margin:0 0 4px; font-size:16px; color:#fff;">🎓 Falta tu carrera</h3>
+                    <p style="margin:0; font-size:12px; color:var(--text-muted); line-height:1.4;">Necesitamos saber tu carrera para consultar los cupos en el SIIAU.</p>
+                </div>
+                <div id="listaCarrerasModal" style="padding:12px 14px calc(16px + env(safe-area-inset-bottom, 0px)); overflow-y:auto;"></div>
+            </div>`;
+        document.body.appendChild(overlay);
+
+        const lista = overlay.querySelector('#listaCarrerasModal');
+        CARRERAS_DISPONIBLES.forEach(c => {
+            const fila = document.createElement('div');
+            fila.style.cssText = 'padding:14px; margin-bottom:8px; border-radius:12px; cursor:pointer; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; gap:10px;';
+            fila.innerHTML = `
+                <div style="min-width:0;">
+                    <strong style="font-size:13px; color:#fff;">${c.nombre}</strong>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Clave: ${c.id}</div>
+                </div>
+                <span style="color:#0A84FF; font-size:20px; flex-shrink:0;">›</span>`;
+            fila.onmouseenter = () => { fila.style.background = 'rgba(10,132,255,0.15)'; fila.style.borderColor = 'rgba(10,132,255,0.4)'; };
+            fila.onmouseleave = () => { fila.style.background = 'rgba(255,255,255,0.04)'; fila.style.borderColor = 'rgba(255,255,255,0.08)'; };
+            fila.onclick = () => { cerrarModalCarrera(); resolve(c.id); };
+            lista.appendChild(fila);
+        });
+    });
+}
+
+function cerrarModalCarrera() {
+    const overlay = document.getElementById('modalCarreraOverlay');
+    if (overlay) overlay.remove();
 }
 
 function agregarAlHorario() {
@@ -239,4 +246,3 @@ function renderizarHorario() {
         }
     });
 }
-
