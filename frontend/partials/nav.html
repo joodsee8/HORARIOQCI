@@ -1,4 +1,4 @@
-   <nav class="navbar" id="mainNav">
+<nav class="navbar" id="mainNav">
         <button class="nav-btn mobile-hidden" onclick="cambiarPagina('form-page')"><span class="nav-text">Registro</span></button>
         <button class="nav-btn mobile-hidden" onclick="cambiarPagina('list-page')"><span class="nav-text">Semestres</span></button>
         
@@ -13,6 +13,10 @@
         <button class="nav-btn" style="background: rgba(10, 132, 255, 0.15); color: #64D2FF; border: 1px solid rgba(10, 132, 255, 0.3);" onclick="cambiarPagina('generador-page')" title="Auto Generador">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
             <span class="nav-text">Auto Generador</span>
+        </button>
+        <button class="nav-btn" onclick="cambiarPagina('comparador-page')" title="Comparador de Horarios">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 3v18M15 3v18M4 8h5M15 8h5M4 16h5M15 16h5"></path></svg>
+            <span class="nav-text">Comparador</span>
         </button>
         <!--<button class="nav-btn" onclick="cambiarPagina('dashboard-page')" title="Analítica">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"></path></svg>
@@ -32,8 +36,4 @@
         <button class="hamburger-btn" onclick="toggleMobileMenu()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
-                 <!-- Agrega este botón donde quieras que aparezca, idealmente dentro de tu navbar -->
-         <button class="nav-btn mobile-hidden" id="btn-theme" onclick="toggleTheme()">
-             🌞 Modo Claro
-         </button>
     </nav>
