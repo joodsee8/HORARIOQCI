@@ -1,654 +1,363 @@
 // =================================================================
-// 9. CEREBRO DEL GENERADOR DE HORARIOS (Dual Intelligence)
+// 13. COMPARADOR DE HORARIOS
 // =================================================================
-function toggleGeneradorUI() {
-    const chk = document.getElementById('chkTurnoUnico').checked;
-    document.getElementById('turnoFijoContainer').style.display = chk ? 'block' : 'none';
-    document.getElementById('turnoDiasContainer').style.display = chk ? 'none' : 'block';
-    
-    const panel = document.getElementById('panelDiasAvanzado');
-    if(panel && panel.innerHTML.trim() === '') {
-        let horas = '';
-        for(let i=7; i<=21; i++) { let h = i<10?`0${i}`:i; horas+=`<option value="${h}:00">${h}:00</option>`; }
-        ['L', 'M', 'I', 'J', 'V', 'S'].forEach(letra => {
-            panel.innerHTML += `
-            <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; display:flex; gap:10px; align-items:center;">
-                <strong style="width:15px; font-size:13px; color:var(--accent-blue);">${letra}:</strong>
-                <label style="display:flex; align-items:center; gap:5px; margin:0; cursor:pointer;">
-                    <input type="checkbox" id="desc-${letra}" title="Descanso" onchange="document.getElementById('ini-${letra}').disabled=this.checked; document.getElementById('fin-${letra}').disabled=this.checked;"> 
-                    <span style="font-size:11px; color:#86868B;">Descanso</span>
-                </label>
-                <select id="ini-${letra}" style="padding:6px; font-size:11px; flex:1;">${horas}</select>
-                <span style="font-size:11px; color:var(--text-muted);">a</span>
-                <select id="fin-${letra}" style="padding:6px; font-size:11px; flex:1;"><option value="21:55">21:55</option>${horas}</select>
-            </div>`;
-        });
-    }
-}
-
-function cargarSemestreGenerador() {
-    const sem = parseInt(document.getElementById('selSemestreGenerador').value);
-    if(isNaN(sem)) return alert("Selecciona un semestre válido de la lista.");
-    if(Object.keys(ofertaAcademica).length === 0) return alert("Sube el JSON de Oferta Académica en la pestaña Horarios primero.");
-    const matSemestre = materias.filter(m => m.semestre === sem && m.estado !== 'aprobada' && m.estado !== 'convalidada' && m.nrc !== 'SSINQU' && m.nrc !== 'IA896');
-    if(matSemestre.length === 0) return alert(`No hay materias pendientes por cursar en el semestre ${sem}.`);
-    
-    let agregadas = 0; let noEncontradas = [];
-    matSemestre.forEach(m => {
-        let existeEnOferta = Object.values(ofertaAcademica).some(o => o.clave === (m.nrcOriginal || m.nrc));
-        if(existeEnOferta) {
-            if(!cursosGenerador.find(c => c.clave === (m.nrcOriginal || m.nrc))) { cursosGenerador.push({ clave: (m.nrcOriginal || m.nrc), nombre: m.nombre }); agregadas++; }
-        } else { noEncontradas.push(m.nombre); }
-    });
-
-    renderizarListaGenerador(); actualizarListaMaestros();
-    if(noEncontradas.length > 0) alert(`Se agregaron ${agregadas} materias.\n\nIgnoradas (No se ofertaron):\n- ${noEncontradas.join('\n- ')}`);
-}
-
-function agregarCursoGenerador(val) {
-    if(!val) return;
-    let clave = val.split(' - ')[0].trim().toUpperCase(); let nombreMateria = "";
-    for(let nrc in ofertaAcademica) { if(ofertaAcademica[nrc].clave === clave) { nombreMateria = ofertaAcademica[nrc].materia; break; } }
-    if(!nombreMateria) return alert("La materia no se encuentra en el JSON de oferta actual.");
-    if(cursosGenerador.find(c => c.clave === clave)) return alert("Ya agregaste esta materia.");
-    cursosGenerador.push({ clave: clave, nombre: nombreMateria });
-    document.getElementById('buscadorGenerador').value = ''; renderizarListaGenerador(); actualizarListaMaestros();
-}
-
-function eliminarCursoGenerador(clave) {
-    cursosGenerador = cursosGenerador.filter(c => c.clave !== clave);
-    renderizarListaGenerador(); actualizarListaMaestros();
-}
-
-function renderizarListaGenerador() {
-    const ul = document.getElementById('listaCursosGenerador'); ul.innerHTML = '';
-    if(cursosGenerador.length === 0) { ul.innerHTML = '<span style="color:var(--text-muted); font-size:12px;">No hay materias seleccionadas.</span>'; }
-    cursosGenerador.forEach(c => { ul.innerHTML += `<li><span><strong style="color:var(--accent-blue);">${c.clave}</strong> - ${c.nombre}</span> <button class="btn-eliminar" style="background:rgba(255, 69, 58, 0.2); color:#FF453A; border:1px solid rgba(255, 69, 58, 0.3);" onclick="eliminarCursoGenerador('${c.clave}')">X</button></li>`; });
-}
-
-function actualizarListaMaestros() {
-    const contenedor = document.getElementById('listaMaestrosVeto');
-    if(!contenedor) return;
-    if(cursosGenerador.length === 0) { contenedor.innerHTML = '<span style="font-size:11px; color:var(--text-muted);">Agrega materias primero para ver a los profesores...</span>'; return; }
-
-    contenedor.innerHTML = ''; let hayProfesoresEnTotal = false;
-
-    cursosGenerador.forEach(c => {
-        let nrcs = Object.keys(ofertaAcademica).filter(k => ofertaAcademica[k].clave === c.clave);
-        let profesDeLaMateria = new Set();
-        nrcs.forEach(nrc => { let prof = ofertaAcademica[nrc].profesor; if(prof && prof.trim() !== '' && prof.toLowerCase() !== 'por definir') { profesDeLaMateria.add(prof.trim()); hayProfesoresEnTotal = true; } });
-
-        if(profesDeLaMateria.size > 0) {
-            let arrProfes = Array.from(profesDeLaMateria).sort();
-            let htmlProfes = '';
-            arrProfes.forEach(p => {
-                htmlProfes += `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 0 10px; font-size:11px; color:#fff; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px;">
-                    <span style="flex:1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${p}">${p}</span>
-                    <div style="display:flex; gap: 12px;">
-                        <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#FF453A;" title="Vetar"><input type="checkbox" class="chk-veto" value="${p}">🚫</label>
-                        <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#FFD60A;" title="Favorito"><input type="checkbox" class="chk-fav" value="${p}">⭐</label>
-                    </div>
-                </div>`;
-            });
-
-            contenedor.innerHTML += `
-            <details style="margin-bottom: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 6px;">
-                <summary style="font-size:11.5px; color:var(--accent-blue); cursor:pointer; font-weight:600; outline:none; line-height: 1.3;">
-                    ${c.nombre} <span style="color:var(--text-muted); font-size:9.5px; font-weight:normal;">(${arrProfes.length} profes)</span>
-                </summary>
-                <div style="margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 5px;">${htmlProfes}</div>
-            </details>`;
-        }
-    });
-
-    if(!hayProfesoresEnTotal) contenedor.innerHTML = '<span style="font-size:11px; color:var(--text-muted);">No hay profesores definidos.</span>';
-}
-
-function obtenerPreferencias() {
-    let isGlobal = document.getElementById('chkTurnoUnico').checked;
-    let vetados = []; let favoritos = [];
-    document.querySelectorAll('.chk-veto:checked').forEach(chk => vetados.push(chk.value));
-    document.querySelectorAll('.chk-fav:checked').forEach(chk => favoritos.push(chk.value));
-    let prefs = { type: isGlobal ? 'global' : 'daily', limites: {}, vetados: vetados, favoritos: favoritos };
-
-    if(isGlobal) { prefs.turno = document.getElementById('selTurnoGlobal').value; } 
-    else {
-        ['L', 'M', 'I', 'J', 'V', 'S'].forEach(letra => {
-            let isDescanso = document.getElementById(`desc-${letra}`).checked;
-            if(isDescanso) { prefs.limites[letra] = 'descanso'; } 
-            else { prefs.limites[letra] = { min: convertirHoraAMinutos(document.getElementById(`ini-${letra}`).value), max: convertirHoraAMinutos(document.getElementById(`fin-${letra}`).value) }; }
-        });
-    }
-    return prefs;
-}
-
-function respetaRestricciones(curso, prefs) {
-    if(prefs.vetados && prefs.vetados.length > 0 && curso.profesor) { if(prefs.vetados.includes(curso.profesor.trim())) return false; }
-    for(let h of curso.horarios) {
-        let ini = convertirHoraAMinutos(h.inicio); let fin = convertirHoraAMinutos(h.fin);
-        if(prefs.type === 'global') {
-            if(prefs.turno === 'matutino' && fin > 895) return false;
-            if(prefs.turno === 'vespertino' && ini < 750) return false;
-        } else {
-            let restDia = prefs.limites[h.dia];
-            if(!restDia || restDia === 'descanso') return false; 
-            if(ini < restDia.min || fin > restDia.max) return false;
-        }
-    }
-    return true;
-}
-
-function tieneMasDe7HorasSeguidas(nrcs) {
-    let horarioPorDia = { 'L': [], 'M': [], 'I': [], 'J': [], 'V': [], 'S': [] };
-    nrcs.forEach(nrc => { ofertaAcademica[nrc].horarios.forEach(h => { if(h.inicio !== "00:00" && h.inicio !== "0:00") horarioPorDia[h.dia].push({ ini: convertirHoraAMinutos(h.inicio), fin: convertirHoraAMinutos(h.fin) }); }); });
-
-    for(let dia in horarioPorDia) {
-        let clases = horarioPorDia[dia].sort((a,b) => a.ini - b.ini);
-        if(clases.length === 0) continue;
-        let bloqueInicio = clases[0].ini; let bloqueFin = clases[0].fin;
-        for(let i = 1; i < clases.length; i++) {
-            let c = clases[i];
-            if(c.ini - bloqueFin <= 30) { bloqueFin = Math.max(bloqueFin, c.fin); } 
-            else {
-                if(bloqueFin - bloqueInicio > 420) return true; 
-                bloqueInicio = c.ini; bloqueFin = c.fin;
-            }
-        }
-        if(bloqueFin - bloqueInicio > 420) return true;
-    }
-    return false;
-}
-
-function calcularPuntajeFavoritos(nrcs, favoritos) {
-    let count = 0; nrcs.forEach(nrc => { let prof = ofertaAcademica[nrc].profesor; if(prof && favoritos.includes(prof.trim())) count++; });
-    return count;
-}
-
-// Motor de backtracking: arma todas las combinaciones posibles de un NRC por
-// grupo (un grupo = un arreglo de NRC candidatos para una misma "posición" del
-// horario), descartando choques de horario y respetando la regla de "no más
-// de 7 horas seguidas" (salvo turno mixto). Es EL MISMO motor que usa el
-// Generador de Horarios; el Comparador de Horarios lo reutiliza tal cual,
-// simplemente armando sus propios `gruposMaterias` (con un solo NRC fijo para
-// las materias que sí cumplen, y un pool de alternativas para las que no).
-function generarCombinaciones(gruposMaterias, prefs, { limite = 1500 } = {}) {
-    const resultados = [];
-    const esMixto = (prefs.type === 'global' && prefs.turno === 'mixto');
-
-    function backtrack(index, horarioTemp) {
-        if (resultados.length >= limite) return;
-        if (index === gruposMaterias.length) {
-            const masDe7h = tieneMasDe7HorasSeguidas(horarioTemp);
-            if (masDe7h && !esMixto) return;
-            resultados.push({ nrcs: [...horarioTemp], masDe7h });
-            return;
-        }
-        for (const nrc of gruposMaterias[index]) {
-            if (!choca(ofertaAcademica[nrc], horarioTemp)) {
-                horarioTemp.push(nrc);
-                backtrack(index + 1, horarioTemp);
-                horarioTemp.pop();
-            }
-        }
-    }
-
-    backtrack(0, []);
-    return resultados;
-}
-
-function choca(cursoNuevo, listaNrcsActual) {
-    for(let hN of cursoNuevo.horarios) {
-        if(hN.inicio === "00:00" || hN.inicio === "0:00") continue; 
-        let sN = convertirHoraAMinutos(hN.inicio); let eN = convertirHoraAMinutos(hN.fin);
-        for(let nrcG of listaNrcsActual) {
-            let cursoG = ofertaAcademica[nrcG];
-            for(let hG of cursoG.horarios) {
-                if(hG.inicio === "00:00" || hG.inicio === "0:00") continue;
-                if(hN.dia === hG.dia) { let sG = convertirHoraAMinutos(hG.inicio); let eG = convertirHoraAMinutos(hG.fin); if(sN < eG && eN > sG) return true; }
-            }
-        }
-    }
-    return false;
-}
-
-async function ejecutarGenerador() {
-    if(Object.keys(ofertaAcademica).length === 0) { alert("Sube primero el JSON de oferta en la pestaña Horarios."); return; }
-    if(cursosGenerador.length === 0) { alert("Agrega al menos una materia."); return; }
-
-    const btn = document.getElementById('btnEjecutarGen');
-    if(btn) { btn.innerHTML = 'Filtrando maestros y horarios...'; btn.disabled = true; }
-
-    let prefs = obtenerPreferencias(); let gruposMaterias = []; let errorFaltaOferta = false;
-    
-    cursosGenerador.forEach(c => {
-        let nrcsDisponibles = Object.keys(ofertaAcademica).filter(k => ofertaAcademica[k].clave === c.clave);
-        let nrcsFiltrados = nrcsDisponibles.filter(nrc => respetaRestricciones(ofertaAcademica[nrc], prefs));
-        if(nrcsFiltrados.length === 0) { errorFaltaOferta = c.nombre; }
-        gruposMaterias.push(nrcsFiltrados);
-    });
-
-    if(errorFaltaOferta) {
-        if(btn) { btn.innerHTML = 'Generar Opciones'; btn.disabled = false; }
-        return alert(`Imposible agendar:\n"${errorFaltaOferta}"\nTodos sus profes están vetados o no encajan en tus horas.`);
-    }
-
-    const chkCupos = document.getElementById('chkCuposEnVivo');
-    if (chkCupos && chkCupos.checked) {
-        if(btn) btn.innerHTML = 'Consultando SIIAU en vivo... ⏳';
-        let minCupos = parseInt(document.getElementById('minCuposVal').value) || 1;
-        let nrcsAProbar = gruposMaterias.flat(); 
-
-        try {
-            const dictCupos = await consultarCuposEnVivo(nrcsAProbar);
-
-            for (let i = 0; i < gruposMaterias.length; i++) {
-                gruposMaterias[i] = gruposMaterias[i].filter(nrc => ((dictCupos[nrc] && dictCupos[nrc].disponibles) || 0) >= minCupos);
-                if (gruposMaterias[i].length === 0) {
-                    if(btn) { btn.innerHTML = 'Generar Opciones'; btn.disabled = false; }
-                    return alert(`Sold Out 💀:\n"${cursosGenerador[i].nombre}"\nNingún grupo disponible tiene ${minCupos} cupo(s) en este momento.`);
-                }
-            }
-        } catch (error) {
-            if(btn) { btn.innerHTML = 'Generar Opciones'; btn.disabled = false; }
-            return alert("⚠️ Error al conectar con el backend para checar cupos. Revisa tu terminal.");
-        }
-    }
-
-    if(btn) btn.innerHTML = 'Armando combinaciones masivas...';
-
-    setTimeout(() => {
-        todosLosResultados = generarCombinaciones(gruposMaterias, prefs);
-        window.prefsGeneradorGlobal = prefs;
-        let poolEfi = []; let poolFav = [];
-
-        todosLosResultados.forEach(res => {
-            if (!res.masDe7h) { poolEfi.push(res.nrcs); }
-            poolFav.push(res.nrcs);
-        });
-
-        window.resultadosEfi = poolEfi.sort((a, b) => calcularPuntajeHorario(b) - calcularPuntajeHorario(a));
-
-        if (prefs.favoritos.length > 0) {
-            window.resultadosFav = poolFav.sort((a, b) => {
-                let fA = calcularPuntajeFavoritos(a, prefs.favoritos); let fB = calcularPuntajeFavoritos(b, prefs.favoritos);
-                if(fB !== fA) return fB - fA; return calcularPuntajeHorario(b) - calcularPuntajeHorario(a);
-            });
-            let topFavStrings = window.resultadosFav.slice(0, 30).map(arr => arr.join(','));
-            window.resultadosEfi = window.resultadosEfi.filter(arr => !topFavStrings.includes(arr.join(',')));
-        } else { window.resultadosFav = []; }
-
-        resultadosMostrados = 0;
-        window.cardState = {};
-        document.getElementById('resultadosGenerador').innerHTML = '';
-        mostrarMasResultados();
-
-        if(btn) { btn.innerHTML = 'Generar Opciones'; btn.disabled = false; }
-    }, 50);
-}
-
-function calcularPuntajeHorario(nrcs) {
-    let score = 0; let diasOcupados = new Set(); let gapsTotales = 0;
-    let horarioPorDia = { 'L': [], 'M': [], 'I': [], 'J': [], 'V': [], 'S': [] };
-    nrcs.forEach(nrc => { ofertaAcademica[nrc].horarios.forEach(h => { if(h.inicio !== "00:00" && h.inicio !== "0:00") { diasOcupados.add(h.dia); horarioPorDia[h.dia].push({ ini: convertirHoraAMinutos(h.inicio), fin: convertirHoraAMinutos(h.fin) }); } }); });
-
-    score += (6 - diasOcupados.size) * 100;
-    if(!diasOcupados.has('S')) score += 200;
-
-    for(let dia in horarioPorDia) {
-        let clases = horarioPorDia[dia].sort((x, y) => x.ini - y.ini);
-        for(let i = 0; i < clases.length - 1; i++) { let gap = clases[i+1].ini - clases[i].fin; if(gap > 0) gapsTotales += gap; }
-    }
-    score -= (gapsTotales / 30) * 10; 
-    return score;
-}
-
-function armarTarjetaHorario(res, index, tag, mapaCuposOpcional = null) {
-    const uid = `${tag}-${index}`;
-    window.cardState[uid] = { nrcs: [...res], index, tag, mapaCupos: mapaCuposOpcional };
-    return `<div class="gen-opcion" id="card-${uid}" style="margin-bottom:0;">${cuerpoTarjeta(uid)}</div>`;
-}
-
-// Construye el contenido interno de una tarjeta a partir de su estado actual.
-// Separado de armarTarjetaHorario para poder volver a dibujar SOLO esta tarjeta
-// (sin tocar el resto de las opciones) cuando el usuario cambia un maestro.
-function cuerpoTarjeta(uid) {
-    const state = window.cardState[uid];
-    const res = state.nrcs; const index = state.index; const tag = state.tag;
-
-    let scoreEfi = Math.round(calcularPuntajeHorario(res));
-    let scoreFav = calcularPuntajeFavoritos(res, window.prefsGeneradorGlobal.favoritos);
-
-    let htmlList = '<ul style="list-style:none; padding:0; margin-top:15px;">';
-    res.forEach((nrc, posicion) => {
-        let m = ofertaAcademica[nrc]; let hrs = m.horarios.map(h => `${h.dia} ${h.inicio}-${h.fin}`).join(' | ');
-        let esFav = window.prefsGeneradorGlobal.favoritos.includes(m.profesor?.trim()) ? '⭐ ' : '';
-
-        // Si esta tarjeta trae un mapa de cupos (lo arma el Comparador de Horarios),
-        // mostramos el badge; el Generador normal no lo pasa, así que no cambia su vista.
-        let badgeCupos = '';
-        if (state.mapaCupos && state.mapaCupos[nrc]) {
-            const dis = state.mapaCupos[nrc].disponibles;
-            const color = dis > 0 ? '#30D158' : '#FF453A';
-            badgeCupos = ` · <span style="color:${color}; font-weight:bold;">${dis} cupo(s)</span>`;
-        }
-
-        htmlList += `<li style="font-size:12px; margin-bottom:8px; color:var(--text-muted);">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-                <div style="flex:1; min-width:0;">
-                    <strong style="color:#fff;">${m.materia}</strong><br>
-                    <span style="color:var(--accent-blue);">NRC: ${nrc}</span> | Prof: <span style="color:#fff">${esFav}${m.profesor || 'Por definir'}</span>${badgeCupos}<br>
-                    <i>${hrs}</i>
-                </div>
-                <button type="button" style="flex-shrink:0; background:rgba(10,132,255,0.15); color:#0A84FF; border:1px solid rgba(10,132,255,0.4); border-radius:8px; padding:5px 8px; font-size:11px; cursor:pointer; white-space:nowrap;" onclick="abrirSelectorMaestro('${uid}', ${posicion}, '${m.clave}')">🔄 Cambiar</button>
-            </div>
-        </li>`;
-    });
-    htmlList += '</ul>';
-
-    let jsonArr = JSON.stringify(res);
-    return `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
-            <h4 style="margin:0; border:none; font-size:14px;">Opción #${index + 1} <span style="font-size:10px; opacity:0.6;">(${tag})</span></h4>
-            <div style="display:flex; gap:6px; flex-shrink:0;">
-                <button type="button" title="Exportar NRC a TXT (para el Registrador)" style="background:rgba(10,132,255,0.15); color:#0A84FF; border:1px solid rgba(10,132,255,0.4); border-radius:8px; padding:6px 10px; font-size:12px; cursor:pointer;" onclick='descargarTxtDeNrcs(${jsonArr}, "NRC_opcion${index + 1}.txt")'>📥 TXT</button>
-                <button class="btn-submit" style="background:rgba(48, 209, 88, 0.2) !important; color:#30D158 !important; border:1px solid rgba(48, 209, 88, 0.4); padding:6px 12px; font-size:12px;" onclick='aplicarHorarioGenerado(${jsonArr})'>Aplicar</button>
-            </div>
-        </div>
-        <div style="font-size:11px; margin-bottom:10px;"><span style="color:#FFD60A; margin-right:10px; font-weight:bold;">⭐ Favoritos: ${scoreFav}</span><span style="color:#64D2FF; font-weight:bold;">⚡ Eficiencia: ${scoreEfi}</span></div>
-        <div class="mini-cal">${dibujarMiniCalendario(res)}</div>${htmlList}`;
-}
-
-// Vuelve a dibujar SOLO la tarjeta indicada, tomando su estado actualizado.
-function renderizarTarjeta(uid) {
-    const el = document.getElementById(`card-${uid}`);
-    if (el) el.innerHTML = cuerpoTarjeta(uid);
-}
-
-function mostrarMasResultados() {
-    const container = document.getElementById('resultadosGenerador');
-    const cargarMasBtn = document.getElementById('contenedorCargarMas');
-    
-    if(window.resultadosFav.length === 0 && window.resultadosEfi.length === 0) {
-        container.innerHTML = `<div class="locked-screen"><h3>Sin combinaciones</h3><p>Las materias chocan entre sí, no hay cupos o rompieron la regla de las 7 horas seguidas.</p></div>`;
-        cargarMasBtn.style.display = 'none'; return;
-    }
-
-    if(resultadosMostrados === 0) {
-        let htmlBase = '';
-        if(window.resultadosFav.length > 0) { htmlBase += `<details class="semestre-block" id="detallesFav" open><summary class="semestre-summary" style="color: #FFD60A !important;">⭐ Listado por Favoritos (Prioridad Alta)</summary><div id="gridFav" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:25px; padding: 15px;"></div></details>`; }
-        if(window.resultadosEfi.length > 0) { htmlBase += `<details class="semestre-block" id="detallesEfi" style="margin-top:20px;" open><summary class="semestre-summary" style="color: #64D2FF !important;">⚡ Listado por Eficiencia (Anti-Huecos)</summary><div id="gridEfi" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:25px; padding: 15px;"></div></details>`; }
-        container.innerHTML = htmlBase;
-    }
-
-    let limite = resultadosMostrados + 6; 
-    const gridFav = document.getElementById('gridFav'); const gridEfi = document.getElementById('gridEfi');
-
-    for(let i = resultadosMostrados; i < limite; i++) {
-        if(gridFav && i < window.resultadosFav.length) { gridFav.innerHTML += armarTarjetaHorario(window.resultadosFav[i], i, 'FAV'); }
-        if(gridEfi && i < window.resultadosEfi.length) { gridEfi.innerHTML += armarTarjetaHorario(window.resultadosEfi[i], i, 'EFI'); }
-    }
-
-    resultadosMostrados = limite;
-    cargarMasBtn.style.display = (resultadosMostrados >= window.resultadosFav.length && resultadosMostrados >= window.resultadosEfi.length) ? 'none' : 'block';
-}
-
-function dibujarMiniCalendario(arregloNrcs) {
-    const dias = ['L', 'M', 'I', 'J', 'V', 'S']; let html = `<div></div>`; 
-    dias.forEach((d, idx) => html += `<div class="mini-header" style="grid-row:1; grid-column:${idx+2};">${d}</div>`);
-    for(let i = 7; i <= 21; i++) {
-        let row = i - 5; html += `<div class="mini-hora" style="grid-row:${row}; grid-column:1;">${i}</div>`;
-        for(let j=0; j<6; j++) { html += `<div class="mini-celda" style="grid-row:${row}; grid-column:${j+2};"></div>`; }
-    }
-    
-    const paletaColores = ['#FF2D55', '#FF9F0A', '#FFD60A', '#30D158', '#64D2FF', '#0A84FF', '#5E5CE6', '#BF5AF2', '#FF375F'];
-    let colorMap = {}; let colorIndex = 0;
-
-    arregloNrcs.forEach(nrc => {
-        let curso = ofertaAcademica[nrc];
-        if(!colorMap[curso.clave]) { colorMap[curso.clave] = paletaColores[colorIndex % paletaColores.length]; colorIndex++; }
-        let colorClase = colorMap[curso.clave];
-
-        curso.horarios.forEach(h => {
-            if(h.inicio === "00:00" || h.inicio === "0:00") return; 
-            let diaIndex = dias.indexOf(h.dia);
-            let startMin = convertirHoraAMinutos(h.inicio) - 420; let endMin = convertirHoraAMinutos(h.fin) - 420; let duracion = endMin - startMin;
-            let topOffset = (startMin % 60) * (20 / 60); let altura = duracion * (20 / 60); let gridRowStart = Math.floor(startMin / 60) + 2; let gridCol = diaIndex + 2;
-            let rgbaBg = hexToRgba(colorClase, 0.3); let borderLeft = `3px solid ${colorClase}`;
-            let palabras = curso.materia.trim().split(/\s+/); let nombreMini = palabras[0];
-            
-            if (palabras.length > 1) {
-                let conectores = ['DE', 'LA', 'EL', 'LOS', 'LAS', 'Y', 'EN', 'A', 'PARA', 'I', 'II', 'III']; let idx = 1;
-                while (idx < palabras.length && conectores.includes(palabras[idx].toUpperCase())) idx++;
-                let palabraClave = (idx < palabras.length) ? palabras[idx] : palabras[1];
-                nombreMini = palabras[0].charAt(0) + '. ' + palabraClave;
-            }
-
-            html += `<div class="mini-bloque" style="grid-column:${gridCol}; grid-row:${gridRowStart} / span ${Math.ceil(duracion/60)}; background:${rgbaBg}; border-left:${borderLeft}; margin-top:${topOffset}px; height:${altura-2}px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
-                <span style="display:block; font-weight:bold; font-size:6px; text-align:center; word-wrap:break-word; line-height:1.1;">${nombreMini}</span>
-            </div>`;
-        });
-    });
-    return html;
-}
-
-window.aplicarHorarioGenerado = function(arrNrcs) { if(confirm("¿Reemplazar tu horario actual con esta opción?")) { horarioActual = arrNrcs; guardarHorario(); cambiarPagina('horario-page'); } }
-
-// =================================================================
-// 9b. CAMBIAR MAESTRO/HORARIO DENTRO DE UNA OPCIÓN GENERADA
+// No implementa NADA nuevo a nivel de motor: reutiliza tal cual el mismo
+// backtracking del Generador (generarCombinaciones), la misma detección de
+// choques (choca), el mismo filtro de restricciones/veto (respetaRestricciones,
+// vía window.prefsGeneradorGlobal), la misma consulta de cupos en vivo
+// (consultarCuposEnVivo, con su propio modal de "falta la carrera" incluido
+// gratis) y el mismo componente visual de tarjeta (armarTarjetaHorario /
+// cuerpoTarjeta / abrirSelectorMaestro), así que "Cambiar" maestro también
+// funciona igual dentro de una opción del Comparador.
+//
+// Lo único nuevo aquí es: parsear la lista de NRC de otra persona, decidir
+// cuáles ya no cumplen el mínimo de cupos, armar los "grupos" (fijo vs. pool
+// de alternativas) para alimentar generarCombinaciones(), y puntuar/ordenar
+// las combinaciones resultantes según qué tan parecidas son al horario
+// original.
 // =================================================================
 
-function formatearHorariosMaestro(horarios) {
-    const validos = horarios.filter(h => h.inicio !== "00:00" && h.inicio !== "0:00");
-    if (validos.length === 0) return "Sin horario definido";
-    return validos.map(h => `${h.dia}: ${h.inicio} - ${h.fin}`).join(' | ');
-}
+/**
+ * Acepta TXT pegado, lista manual o NRC separados por comas: separa por
+ * saltos de línea, comas, punto y coma o espacios. Valida 4-6 dígitos,
+ * quita duplicados y trunca a 10 (límite real del SIIAU).
+ */
+function parsearNrcsComparador(textoPlano) {
+    const tokens = (textoPlano || '')
+        .split(/[\n\r,;]+|\s+/)
+        .map(t => t.trim())
+        .filter(t => t.length > 0);
 
-// Abre la ventana flotante con todos los grupos/maestros disponibles para
-// la materia en esa posición de la opción generada (uid = tarjeta, posicion = índice dentro del arreglo de esa opción).
-async function abrirSelectorMaestro(uid, posicion, claveMateria) {
-    const state = window.cardState[uid];
-    if (!state) return;
-    const nrcActual = state.nrcs[posicion];
-    const candidatosDirectos = Object.keys(ofertaAcademica).filter(k => ofertaAcademica[k].clave === claveMateria);
+    const vistos = new Set();
+    const nrcs = [];
+    const descartados = [];
 
-    cerrarModalMaestro();
-    const overlay = document.createElement('div');
-    overlay.id = 'modalCambiarMaestroOverlay';
-    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:9999; display:flex; align-items:flex-end; justify-content:center;';
-    overlay.onclick = (e) => { if (e.target === overlay) cerrarModalMaestro(); };
-
-    overlay.innerHTML = `
-        <div style="width:100%; max-width:480px; max-height:85vh; background:#1c1c1e; border-radius:20px 20px 0 0; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 -4px 30px rgba(0,0,0,0.5);">
-            <div style="padding:16px 18px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
-                <h3 style="margin:0; font-size:15px; color:#fff;">Elegir Maestro / Horario</h3>
-                <button type="button" onclick="cerrarModalMaestro()" style="background:rgba(255,255,255,0.1); border:none; color:#fff; width:28px; height:28px; border-radius:50%; font-size:16px; cursor:pointer; flex-shrink:0;">✕</button>
-            </div>
-            <div id="listaMaestrosModal" style="overflow-y:auto; -webkit-overflow-scrolling:touch; padding:12px 14px calc(14px + env(safe-area-inset-bottom, 0px)); flex:1;">
-                <p style="color:var(--text-muted); font-size:13px; text-align:center; padding:20px 0;">Cargando opciones...</p>
-            </div>
-        </div>`;
-    document.body.appendChild(overlay);
-
-    // 1) Separar candidatos directos: los que NO chocan con nada más de la opción,
-    //    y los que sí chocan con alguna(s) otra(s) materia(s).
-    const otrasMateriasFijas = state.nrcs.filter((_, i) => i !== posicion);
-    let sinChoque = [];
-    let conChoque = [];
-    candidatosDirectos.forEach(nrc => {
-        if (nrc === nrcActual || !choca(ofertaAcademica[nrc], otrasMateriasFijas)) sinChoque.push(nrc);
-        else conChoque.push(nrc);
+    tokens.forEach(t => {
+        if (!/^\d{4,6}$/.test(t)) { descartados.push(t); return; }
+        if (vistos.has(t)) return;
+        vistos.add(t);
+        nrcs.push(t);
     });
 
-    // 2) Para cada candidato con choque, buscar si hay forma de reacomodar la(s)
-    //    materia(s) afectada(s) con otro grupo de la MISMA materia que no choque
-    //    con nada (respetando el veto y las restricciones de horario del generador).
-    let poolsPorConflicto = {}; // nrc -> [{ posReal, pool: [nrcsAlternativos] }]
-    let universoCupos = new Set(candidatosDirectos);
+    const truncado = nrcs.length > 10;
+    return { nrcs: truncado ? nrcs.slice(0, 10) : nrcs, descartados, truncado };
+}
 
-    conChoque.forEach(nrc => {
-        const conflictos = [];
-        let posible = true;
-        state.nrcs.forEach((nrcOtra, idxReal) => {
-            if (idxReal === posicion) return;
-            if (choca(ofertaAcademica[nrc], [nrcOtra])) {
-                const clave = ofertaAcademica[nrcOtra].clave;
-                const pool = Object.keys(ofertaAcademica)
-                    .filter(k => k !== nrcOtra && ofertaAcademica[k].clave === clave)
-                    .filter(k => respetaRestricciones(ofertaAcademica[k], window.prefsGeneradorGlobal || { vetados: [], limites: {} }));
-                if (pool.length === 0) { posible = false; return; }
-                pool.forEach(p => universoCupos.add(p));
-                conflictos.push({ posReal: idxReal, pool });
+/** Cuenta huecos "largos" (> 2h) y minutos muertos totales de un horario. Regla de Prioridad 3. */
+function analizarHuecos(nrcs) {
+    const porDia = { L: [], M: [], I: [], J: [], V: [], S: [] };
+    nrcs.forEach(nrc => {
+        ofertaAcademica[nrc].horarios.forEach(h => {
+            if (h.inicio === '00:00' || h.inicio === '0:00') return;
+            porDia[h.dia].push({ ini: convertirHoraAMinutos(h.inicio), fin: convertirHoraAMinutos(h.fin) });
+        });
+    });
+
+    let huecosLargos = 0;
+    let minutosMuertosTotal = 0;
+
+    Object.values(porDia).forEach(clases => {
+        clases.sort((a, b) => a.ini - b.ini);
+        for (let i = 0; i < clases.length - 1; i++) {
+            const gap = clases[i + 1].ini - clases[i].fin;
+            if (gap > 0) {
+                minutosMuertosTotal += gap;
+                if (gap > 120) huecosLargos++; // más de 2 horas
             }
-        });
-        if (posible) poolsPorConflicto[nrc] = conflictos;
+        }
     });
 
-    // 3) Si "Cupos en Vivo" está activo, consultamos TODO el universo de NRCs
-    //    involucrados (directos + posibles reemplazos) en una sola llamada al backend.
-    const chkCupos = document.getElementById('chkCuposEnVivo');
-    const usarCuposEnVivo = !!(chkCupos && chkCupos.checked);
-    const minCupos = parseInt(document.getElementById('minCuposVal')?.value) || 1;
-    let mapaCupos = null;
-
-    if (usarCuposEnVivo) {
-        try {
-            mapaCupos = await consultarCuposEnVivo(Array.from(universoCupos));
-        } catch (e) {
-            const aviso = document.getElementById('listaMaestrosModal');
-            if (aviso) aviso.innerHTML = `<p style="color:#FF9F0A; font-size:12px; text-align:center; padding:10px 0;">⚠️ No se pudo verificar cupos en vivo. Mostrando todas las opciones.</p>`;
-        }
-    }
-
-    const contenedor = document.getElementById('listaMaestrosModal');
-    if (!contenedor) return; // el modal se pudo haber cerrado mientras esperábamos
-
-    if (mapaCupos) {
-        sinChoque = sinChoque.filter(nrc => nrc === nrcActual || ((mapaCupos[nrc] && mapaCupos[nrc].disponibles) || 0) >= minCupos);
-    }
-
-    // 4) Con los cupos ya conocidos, resolver el reacomodo de cada candidato con choque
-    //    (búsqueda voraz: fija el candidato nuevo + lo que no choca, y va acomodando
-    //    una por una las materias en conflicto contra ese set ya fijado).
-    const favoritos = (window.prefsGeneradorGlobal && window.prefsGeneradorGlobal.favoritos) || [];
-    let reacomodos = []; // { nrc, cambios: [{ posReal, nrcNuevo }] }
-
-    conChoque.forEach(nrc => {
-        if (!poolsPorConflicto[nrc]) return; // ya se descartó: ninguna alternativa posible
-        if (mapaCupos && ((mapaCupos[nrc] && mapaCupos[nrc].disponibles) || 0) < minCupos) return; // el candidato mismo no tiene cupo
-
-        const posicionesEnConflicto = poolsPorConflicto[nrc].map(c => c.posReal);
-        let fijos = [nrc, ...state.nrcs.filter((_, i) => i !== posicion && !posicionesEnConflicto.includes(i))];
-
-        const cambios = [];
-        let ok = true;
-
-        for (const conflicto of poolsPorConflicto[nrc]) {
-            let opciones = conflicto.pool.filter(k => !choca(ofertaAcademica[k], fijos));
-            if (mapaCupos) opciones = opciones.filter(k => ((mapaCupos[k] && mapaCupos[k].disponibles) || 0) >= minCupos);
-            if (opciones.length === 0) { ok = false; break; }
-
-            // Preferimos, si hay favoritos marcados, mandar primero al profe favorito
-            opciones.sort((a, b) => {
-                const favA = favoritos.includes((ofertaAcademica[a].profesor || '').trim()) ? 1 : 0;
-                const favB = favoritos.includes((ofertaAcademica[b].profesor || '').trim()) ? 1 : 0;
-                return favB - favA;
-            });
-
-            const elegido = opciones[0];
-            fijos.push(elegido);
-            cambios.push({ posReal: conflicto.posReal, nrcNuevo: elegido });
-        }
-
-        if (ok) reacomodos.push({ nrc, cambios });
-    });
-
-    contenedor.innerHTML = construirListaModal(uid, posicion, nrcActual, sinChoque, reacomodos, mapaCupos, usarCuposEnVivo);
+    return { huecosLargos, minutosMuertosTotal };
 }
 
-// Pinta las dos secciones del modal: sin choques primero, con reacomodo después.
-function construirListaModal(uid, posicion, nrcActual, sinChoque, reacomodos, mapaCupos, usarCuposEnVivo) {
-    window.reacomodosTemp = reacomodos; // se lee por índice desde aplicarReacomodo()
-
-    let html = `<div style="font-size:11px; font-weight:bold; color:#30D158; text-transform:uppercase; letter-spacing:0.5px; margin:4px 0 8px;">✅ Disponibles sin mover nada</div>`;
-    if (sinChoque.length === 0) {
-        html += `<p style="color:var(--text-muted); font-size:12px; padding:4px 0 14px;">Ninguno sin conflicto${usarCuposEnVivo ? ' (o sin cupo)' : ''}.</p>`;
-    } else {
-        sinChoque.forEach(nrc => {
-            html += filaMaestro(nrc, nrcActual, mapaCupos, `onclick="seleccionarNuevoMaestro('${uid}', ${posicion}, '${nrc}')"`);
-        });
-    }
-
-    html += `<div style="font-size:11px; font-weight:bold; color:#FF9F0A; text-transform:uppercase; letter-spacing:0.5px; margin:16px 0 8px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);">🔄 Requieren reacomodar otra materia</div>`;
-    if (reacomodos.length === 0) {
-        html += `<p style="color:var(--text-muted); font-size:12px; padding:4px 0;">No hay forma de reacomodar ningún otro grupo sin chocar (o sus reemplazos están vetados o sin cupo).</p>`;
-    } else {
-        reacomodos.forEach((r, idx) => {
-            const detalleCambios = r.cambios.map(c => {
-                const m = ofertaAcademica[c.nrcNuevo];
-                return `<div style="font-size:10.5px; color:#FF9F0A; margin-top:4px;">↳ Mueve <strong>${m.materia}</strong> a Prof: ${m.profesor || 'Por definir'} (${formatearHorariosMaestro(m.horarios)})</div>`;
-            }).join('');
-            html += filaMaestro(r.nrc, nrcActual, mapaCupos, `onclick="aplicarReacomodo('${uid}', ${posicion}, ${idx})"`, detalleCambios);
-        });
-    }
-
-    return html;
+/** Suma de cupos disponibles conocidos para un conjunto de NRC (Prioridad 4, desempate). */
+function totalCuposDisponibles(nrcs, mapaCupos) {
+    return nrcs.reduce((acc, nrc) => acc + ((mapaCupos[nrc] && mapaCupos[nrc].disponibles) || 0), 0);
 }
 
-// Fila reutilizable de "maestro/horario" dentro del modal.
-function filaMaestro(nrc, nrcActual, mapaCupos, onclickAttr, extraHtml) {
-    const curso = ofertaAcademica[nrc];
-    const esActual = nrc === nrcActual;
-    const dias = formatearHorariosMaestro(curso.horarios);
-    let badgeCupos = '';
-    if (mapaCupos && mapaCupos[nrc]) {
-        const dis = mapaCupos[nrc].disponibles;
-        const color = dis > 0 ? '#30D158' : '#FF453A';
-        badgeCupos = `<div style="margin-top:6px; font-size:11px; font-weight:bold; color:${color};">🟢 ${dis} cupo(s) disponibles</div>`;
-    }
-    return `<div ${onclickAttr} style="padding:12px; margin-bottom:8px; border-radius:12px; cursor:pointer; background:${esActual ? 'rgba(10,132,255,0.15)' : 'rgba(255,255,255,0.04)'}; border:1px solid ${esActual ? 'rgba(10,132,255,0.5)' : 'rgba(255,255,255,0.08)'};">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-            <strong style="font-size:13px; color:#fff;">Maestro: ${curso.profesor || 'Por definir'}</strong>
-            ${esActual ? '<span style="font-size:10px; color:#0A84FF; font-weight:bold; flex-shrink:0;">ACTUAL</span>' : ''}
-        </div>
-        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Días: ${dias}</div>
-        <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">NRC: ${nrc}</div>
-        ${badgeCupos}${extraHtml || ''}
-    </div>`;
+/**
+ * Puntúa una combinación candidata frente al horario original, en el orden
+ * de prioridades pedido:
+ *  1) Menos cambios, mejor (peso dominante).
+ *  2) Igual horario que el original = implícito en "menos cambios" (cada
+ *     cambio ya es, por definición, una diferencia).
+ *  3) Menos huecos largos / menos tiempo muerto total.
+ *  4) Desempate: más cupos disponibles en total.
+ */
+function puntuarCombinacion(nrcsCombo, nrcsOriginales, mapaCupos) {
+    const cambios = nrcsCombo.filter((nrc, i) => nrc !== nrcsOriginales[i]).length;
+    const { huecosLargos, minutosMuertosTotal } = analizarHuecos(nrcsCombo);
+    const cupos = totalCuposDisponibles(nrcsCombo, mapaCupos);
+
+    const score = 1000
+        - (cambios * 100)
+        - (huecosLargos * 15)
+        - (minutosMuertosTotal / 10)
+        + (cupos * 0.05);
+
+    return { score, cambios, huecosLargos, minutosMuertosTotal };
 }
 
-function cerrarModalMaestro() {
-    const overlay = document.getElementById('modalCambiarMaestroOverlay');
-    if (overlay) overlay.remove();
+/** Preferencias a usar: reutiliza las del Generador si ya se configuraron; si no, sin restricciones. */
+function obtenerPreferenciasParaComparador() {
+    return window.prefsGeneradorGlobal || { type: 'global', turno: 'mixto', limites: {}, vetados: [], favoritos: [] };
 }
 
-// Reemplaza el NRC de esa materia SOLO dentro de esta opción generada (caso "sin choque"),
-// y vuelve a dibujar nada más esa tarjeta.
-function seleccionarNuevoMaestro(uid, posicion, nuevoNrc) {
-    const state = window.cardState[uid];
-    if (!state) return;
-    if (state.nrcs[posicion] === nuevoNrc) { cerrarModalMaestro(); return; }
+async function ejecutarComparador() {
+    if (!window.cardState) window.cardState = {};
 
-    const otrasMaterias = state.nrcs.filter((_, i) => i !== posicion);
-    if (choca(ofertaAcademica[nuevoNrc], otrasMaterias)) {
-        alert('⚠️ Ese horario choca con otra materia de esta misma opción. Elige otro grupo.');
+    if (Object.keys(ofertaAcademica).length === 0) {
+        alert('Primero extrae la oferta académica en la pestaña "Armador de Horarios" (botón "Extraer Oferta").');
         return;
     }
 
-    state.nrcs[posicion] = nuevoNrc;
-    cerrarModalMaestro();
-    renderizarTarjeta(uid);
+    const texto = document.getElementById('comparadorInputNrcs').value;
+    const { nrcs, descartados, truncado } = parsearNrcsComparador(texto);
+
+    if (nrcs.length === 0) {
+        alert('No se encontró ningún NRC válido (se esperan 4 a 6 dígitos, uno por línea o separados por comas).');
+        return;
+    }
+    if (truncado) alert('Se detectaron más de 10 NRC; el SIIAU solo permite 10, así que solo se usarán los primeros 10.');
+    if (descartados.length > 0) console.warn('[Comparador] Líneas ignoradas (no parecen NRC válidos):', descartados);
+
+    const minCupos = parseInt(document.getElementById('comparadorMinCupos').value) || 1;
+
+    // El modal de "Cambiar maestro" (reutilizado de la tarjeta) lee estos dos
+    // controles del Generador para saber si debe pedir cupos en vivo y con qué
+    // mínimo. El Comparador SIEMPRE trabaja con cupos en vivo, así que los
+    // sincronizamos para que, si el usuario usa "🔄 Cambiar" dentro de una
+    // tarjeta del Comparador, se comporte con el mismo mínimo que acaba de pedir aquí.
+    const chkCuposGenerador = document.getElementById('chkCuposEnVivo');
+    const minCuposGenerador = document.getElementById('minCuposVal');
+    if (chkCuposGenerador) chkCuposGenerador.checked = true;
+    if (minCuposGenerador) minCuposGenerador.value = minCupos;
+
+    const btn = document.getElementById('btnComparar');
+    const contenedor = document.getElementById('resultadosComparador');
+    if (btn) { btn.disabled = true; btn.innerHTML = 'Verificando disponibilidad...'; }
+    contenedor.innerHTML = '';
+
+    const nrcsEnOferta = nrcs.filter(n => ofertaAcademica[n]);
+    const nrcsNoEncontrados = nrcs.filter(n => !ofertaAcademica[n]);
+
+    if (nrcsEnOferta.length === 0) {
+        contenedor.innerHTML = `<div class="locked-screen"><h3>Ningún NRC coincide</h3><p>Ninguno de esos NRC aparece en la oferta académica que ya descargaste. Revisa que el ciclo/centro/carrera en "Armador de Horarios" sean los correctos.</p></div>`;
+        if (btn) { btn.disabled = false; btn.innerHTML = 'Comparar Horario'; }
+        return;
+    }
+
+    let mapaCupos;
+    try {
+        mapaCupos = await consultarCuposEnVivo(nrcsEnOferta);
+    } catch (e) {
+        contenedor.innerHTML = `<div class="locked-screen"><h3>⚠️ Error al consultar cupos</h3><p>No se pudo conectar con el backend del SIIAU. Intenta de nuevo.</p></div>`;
+        if (btn) { btn.disabled = false; btn.innerHTML = 'Comparar Horario'; }
+        return;
+    }
+
+    // --- Diagnóstico inicial: quién falla y por qué ---
+    const fallas = nrcsEnOferta
+        .filter(nrc => ((mapaCupos[nrc] && mapaCupos[nrc].disponibles) || 0) < minCupos)
+        .map(nrc => ({
+            nrc,
+            materia: ofertaAcademica[nrc].materia,
+            disponibles: (mapaCupos[nrc] && mapaCupos[nrc].disponibles) || 0,
+            necesarios: minCupos
+        }));
+
+    // --- Caso ideal: todo cumple y no hay NRC ausentes de la oferta ---
+    if (fallas.length === 0 && nrcsNoEncontrados.length === 0) {
+        renderizarComparadorIdentico(nrcs, mapaCupos, minCupos);
+        if (btn) { btn.disabled = false; btn.innerHTML = 'Comparar Horario'; }
+        return;
+    }
+
+    if (btn) btn.innerHTML = 'Buscando alternativas...';
+
+    const prefs = obtenerPreferenciasParaComparador();
+    const nrcsConsiderados = nrcsEnOferta; // los que sí están en la oferta descargada
+    const mapaOriginalPorGrupo = [];
+    const esReemplazable = [];
+    const gruposMaterias = [];
+    const universoExtraCupos = new Set();
+
+    nrcsConsiderados.forEach(nrcOriginal => {
+        mapaOriginalPorGrupo.push(nrcOriginal);
+        const dis = (mapaCupos[nrcOriginal] && mapaCupos[nrcOriginal].disponibles) || 0;
+
+        if (dis >= minCupos) {
+            gruposMaterias.push([nrcOriginal]);
+            esReemplazable.push(false);
+            return;
+        }
+
+        const clave = ofertaAcademica[nrcOriginal].clave;
+        const pool = Object.keys(ofertaAcademica)
+            .filter(k => k !== nrcOriginal && ofertaAcademica[k].clave === clave)
+            .filter(k => respetaRestricciones(ofertaAcademica[k], prefs));
+
+        pool.forEach(k => universoExtraCupos.add(k));
+        gruposMaterias.push(pool);
+        esReemplazable.push(true);
+    });
+
+    // Una sola consulta en vivo (en lote) para todo el universo de posibles
+    // reemplazos, en vez de una llamada por candidato.
+    if (universoExtraCupos.size > 0) {
+        try {
+            const extra = await consultarCuposEnVivo(Array.from(universoExtraCupos));
+            Object.assign(mapaCupos, extra);
+        } catch (e) {
+            console.warn('[Comparador] No se pudieron verificar cupos de las alternativas; se listarán sin garantía de cupo.');
+        }
+
+        gruposMaterias.forEach((grupo, i) => {
+            if (!esReemplazable[i]) return;
+            gruposMaterias[i] = grupo.filter(k => ((mapaCupos[k] && mapaCupos[k].disponibles) || 0) >= minCupos);
+        });
+    }
+
+    // Materias sin NINGUNA alternativa válida (vetada, chocaría siempre, o
+    // sin cupo): no hay forma de armar un horario completo, hay que avisar
+    // exactamente cuál es el cuello de botella.
+    const sinSolucion = [];
+    gruposMaterias.forEach((grupo, i) => {
+        if (esReemplazable[i] && grupo.length === 0) {
+            const nrcOriginal = mapaOriginalPorGrupo[i];
+            sinSolucion.push({
+                nrc: nrcOriginal,
+                materia: ofertaAcademica[nrcOriginal].materia,
+                disponibles: (mapaCupos[nrcOriginal] && mapaCupos[nrcOriginal].disponibles) || 0,
+                necesarios: minCupos
+            });
+        }
+    });
+
+    if (sinSolucion.length > 0) {
+        renderizarComparadorSinSolucion(sinSolucion, nrcsNoEncontrados);
+        if (btn) { btn.disabled = false; btn.innerHTML = 'Comparar Horario'; }
+        return;
+    }
+
+    if (btn) btn.innerHTML = 'Optimizando combinaciones...';
+
+    // MISMO motor que el Generador de Horarios (generarCombinaciones), solo
+    // que aquí casi todos los "grupos" traen un único NRC fijo (las materias
+    // que sí cumplen) y solo las que fallan traen un pool de alternativas.
+    const combos = generarCombinaciones(gruposMaterias, prefs);
+
+    if (combos.length === 0) {
+        renderizarComparadorSinCombinacion(fallas, nrcsNoEncontrados);
+        if (btn) { btn.disabled = false; btn.innerHTML = 'Comparar Horario'; }
+        return;
+    }
+
+    const puntuados = combos.map(c => {
+        const { score, cambios } = puntuarCombinacion(c.nrcs, mapaOriginalPorGrupo, mapaCupos);
+        return { nrcs: c.nrcs, score, cambios };
+    });
+
+    puntuados.sort((a, b) => b.score - a.score || a.cambios - b.cambios);
+
+    const top = puntuados.slice(0, 5);
+    renderizarComparadorOpciones(top, mapaOriginalPorGrupo, mapaCupos, nrcsNoEncontrados, minCupos);
+
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Comparar Horario'; }
 }
 
-// Aplica un reacomodo completo: cambia el NRC elegido en "posicion" Y los NRCs
-// de la(s) materia(s) que había que mover para que dejaran de chocar.
-function aplicarReacomodo(uid, posicion, idx) {
-    const state = window.cardState[uid];
-    const reacomodo = window.reacomodosTemp && window.reacomodosTemp[idx];
-    if (!state || !reacomodo) return;
+// --- Render: caso ideal (nada que cambiar) ---
 
-    state.nrcs[posicion] = reacomodo.nrc;
-    reacomodo.cambios.forEach(c => { state.nrcs[c.posReal] = c.nrcNuevo; });
+function renderizarComparadorIdentico(nrcsOriginales, mapaCupos, minCupos) {
+    const contenedor = document.getElementById('resultadosComparador');
+    contenedor.innerHTML = `
+        <div class="locked-screen" style="background:rgba(48,209,88,0.08); border:1px solid rgba(48,209,88,0.3);">
+            <h3 style="color:#30D158; margin-top:0;">✅ Puedes registrar exactamente este horario</h3>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:0;">Los ${nrcsOriginales.length} NRC cumplen con el mínimo de ${minCupos} cupo(s) que pediste.</p>
+        </div>
+        <div style="margin-top:15px;">${armarTarjetaHorario(nrcsOriginales, 0, 'CMP', mapaCupos)}</div>`;
+}
 
-    cerrarModalMaestro();
-    renderizarTarjeta(uid);
+// --- Render: hay una o más materias sin ninguna alternativa viable ---
+
+function renderizarComparadorSinSolucion(sinSolucion, nrcsNoEncontrados) {
+    const contenedor = document.getElementById('resultadosComparador');
+    let html = `<div class="locked-screen" style="background:rgba(255,69,58,0.08); border:1px solid rgba(255,69,58,0.3);">
+        <h3 style="color:#FF453A; margin-top:0;">No se pudo armar ninguna alternativa completa</h3>
+        <p style="color:var(--text-muted); font-size:13px;">Al menos una materia no tiene ningún grupo disponible que cumpla tus cupos, tus vetos y tus horarios permitidos a la vez:</p>
+        <ul style="list-style:none; padding:0; margin:10px 0 0;">`;
+
+    sinSolucion.forEach(f => {
+        html += `<li style="padding:10px; margin-bottom:8px; border-radius:10px; background:rgba(255,69,58,0.08); border:1px solid rgba(255,69,58,0.25);">
+            <div><span style="color:var(--accent-blue);">NRC ${f.nrc}</span> · <strong style="color:#fff;">${f.materia}</strong></div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Cupos: ${f.disponibles} · Necesarios: ${f.necesarios}</div>
+            <div style="font-size:11px; color:#FF453A; margin-top:2px;">Motivo: no cumple el mínimo solicitado, y ningún otro grupo de esa materia cumple tus restricciones (veto/turno) con cupo suficiente.</div>
+        </li>`;
+    });
+
+    html += '</ul></div>';
+    html += avisoNoEncontrados(nrcsNoEncontrados);
+    contenedor.innerHTML = html;
+}
+
+// --- Render: había pools válidos por materia pero ninguna combinación conjunta funcionó (chocan entre sí) ---
+
+function renderizarComparadorSinCombinacion(fallas, nrcsNoEncontrados) {
+    const contenedor = document.getElementById('resultadosComparador');
+    let html = `<div class="locked-screen">
+        <h3>Sin combinaciones posibles</h3>
+        <p style="color:var(--text-muted); font-size:13px;">Hay alternativas para las materias con problema de cupo, pero todas terminan chocando con el resto del horario.</p>
+    </div>`;
+    html += avisoNoEncontrados(nrcsNoEncontrados);
+    contenedor.innerHTML = html;
+}
+
+function avisoNoEncontrados(nrcsNoEncontrados) {
+    if (!nrcsNoEncontrados || nrcsNoEncontrados.length === 0) return '';
+    return `<div style="margin-top:12px; font-size:12px; color:#FF9F0A; background:rgba(255,159,10,0.1); border:1px solid rgba(255,159,10,0.3); border-radius:10px; padding:10px;">
+        ⚠️ Estos NRC no aparecen en la oferta académica que ya descargaste, así que no se pudieron evaluar: ${nrcsNoEncontrados.join(', ')}.
+    </div>`;
+}
+
+// --- Render: ranking de opciones (caso con cambios) ---
+
+function renderizarComparadorOpciones(top, nrcsOriginales, mapaCupos, nrcsNoEncontrados, minCupos) {
+    const contenedor = document.getElementById('resultadosComparador');
+    const totalMaterias = nrcsOriginales.length;
+
+    let html = `<p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">No puedes registrar el horario exacto, pero encontramos ${top.length} alternativa(s) parecida(s), de la más a la menos parecida:</p>`;
+    html += avisoNoEncontrados(nrcsNoEncontrados);
+
+    top.forEach((opcion, idx) => {
+        const similitud = Math.round(((totalMaterias - opcion.cambios) / totalMaterias) * 100);
+
+        const cambios = opcion.nrcs
+            .map((nrcNuevo, i) => ({ nrcOriginal: nrcsOriginales[i], nrcNuevo }))
+            .filter(c => c.nrcOriginal !== c.nrcNuevo);
+
+        let htmlCambios = '';
+        if (cambios.length > 0) {
+            htmlCambios = '<div style="margin-bottom:12px;">' + cambios.map(c => {
+                const original = ofertaAcademica[c.nrcOriginal];
+                const nuevo = ofertaAcademica[c.nrcNuevo];
+                const disOriginal = (mapaCupos[c.nrcOriginal] && mapaCupos[c.nrcOriginal].disponibles) || 0;
+                return `<div style="font-size:12px; padding:8px 10px; margin-bottom:6px; border-radius:8px; background:rgba(255,159,10,0.08); border:1px solid rgba(255,159,10,0.25);">
+                    <strong style="color:#fff;">${original.materia}</strong><br>
+                    Reemplaza <span style="color:#FF453A;">NRC ${c.nrcOriginal}</span> (${original.profesor || 'Por definir'}) por <span style="color:#30D158;">NRC ${c.nrcNuevo}</span> (${nuevo.profesor || 'Por definir'})<br>
+                    <span style="color:var(--text-muted); font-size:11px;">Motivo: el NRC original ya solo tiene ${disOriginal} cupo(s) (necesitas ${minCupos}); el nuevo sí cumple.</span>
+                </div>`;
+            }).join('') + '</div>';
+        }
+
+        html += `<div class="comparador-opcion" style="margin-bottom:22px; padding-bottom:22px; border-bottom:1px solid var(--glass-border);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:6px;">
+                <h3 style="margin:0; font-size:15px;">Opción ${idx + 1} <span style="color:#30D158; font-size:13px;">· ${similitud}% similar</span></h3>
+                <span style="font-size:11px; color:var(--text-muted); background:rgba(255,255,255,0.06); padding:4px 10px; border-radius:999px;">${cambios.length} cambio${cambios.length === 1 ? '' : 's'}</span>
+            </div>
+            ${htmlCambios}
+            ${armarTarjetaHorario(opcion.nrcs, idx, 'CMP', mapaCupos)}
+        </div>`;
+    });
+
+    contenedor.innerHTML = html;
 }
