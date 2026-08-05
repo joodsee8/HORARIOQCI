@@ -165,6 +165,38 @@ function calcularPuntajeFavoritos(nrcs, favoritos) {
     return count;
 }
 
+// Motor de backtracking: arma todas las combinaciones posibles de un NRC por
+// grupo (un grupo = un arreglo de NRC candidatos para una misma "posición" del
+// horario), descartando choques de horario y respetando la regla de "no más
+// de 7 horas seguidas" (salvo turno mixto). Es EL MISMO motor que usa el
+// Generador de Horarios; el Comparador de Horarios lo reutiliza tal cual,
+// simplemente armando sus propios `gruposMaterias` (con un solo NRC fijo para
+// las materias que sí cumplen, y un pool de alternativas para las que no).
+function generarCombinaciones(gruposMaterias, prefs, { limite = 1500 } = {}) {
+    const resultados = [];
+    const esMixto = (prefs.type === 'global' && prefs.turno === 'mixto');
+
+    function backtrack(index, horarioTemp) {
+        if (resultados.length >= limite) return;
+        if (index === gruposMaterias.length) {
+            const masDe7h = tieneMasDe7HorasSeguidas(horarioTemp);
+            if (masDe7h && !esMixto) return;
+            resultados.push({ nrcs: [...horarioTemp], masDe7h });
+            return;
+        }
+        for (const nrc of gruposMaterias[index]) {
+            if (!choca(ofertaAcademica[nrc], horarioTemp)) {
+                horarioTemp.push(nrc);
+                backtrack(index + 1, horarioTemp);
+                horarioTemp.pop();
+            }
+        }
+    }
+
+    backtrack(0, []);
+    return resultados;
+}
+
 function choca(cursoNuevo, listaNrcsActual) {
     for(let hN of cursoNuevo.horarios) {
         if(hN.inicio === "00:00" || hN.inicio === "0:00") continue; 
@@ -226,23 +258,7 @@ async function ejecutarGenerador() {
     if(btn) btn.innerHTML = 'Armando combinaciones masivas...';
 
     setTimeout(() => {
-        todosLosResultados = [];
-        
-        function backtrack(index, horarioTemp) {
-            if(todosLosResultados.length >= 1500) return; 
-            if(index === gruposMaterias.length) { 
-                let masDe7h = tieneMasDe7HorasSeguidas(horarioTemp);
-                let esMixto = (prefs.type === 'global' && prefs.turno === 'mixto');
-                if (masDe7h && !esMixto) return;
-                todosLosResultados.push({ nrcs: [...horarioTemp], masDe7h: masDe7h }); 
-                return; 
-            }
-            for(let nrc of gruposMaterias[index]) {
-                if(!choca(ofertaAcademica[nrc], horarioTemp)) { horarioTemp.push(nrc); backtrack(index + 1, horarioTemp); horarioTemp.pop(); }
-            }
-        }
-        
-        backtrack(0, []);
+        todosLosResultados = generarCombinaciones(gruposMaterias, prefs);
         window.prefsGeneradorGlobal = prefs;
         let poolEfi = []; let poolFav = [];
 
@@ -287,9 +303,9 @@ function calcularPuntajeHorario(nrcs) {
     return score;
 }
 
-function armarTarjetaHorario(res, index, tag) {
+function armarTarjetaHorario(res, index, tag, mapaCuposOpcional = null) {
     const uid = `${tag}-${index}`;
-    window.cardState[uid] = { nrcs: [...res], index, tag };
+    window.cardState[uid] = { nrcs: [...res], index, tag, mapaCupos: mapaCuposOpcional };
     return `<div class="gen-opcion" id="card-${uid}" style="margin-bottom:0;">${cuerpoTarjeta(uid)}</div>`;
 }
 
@@ -307,11 +323,21 @@ function cuerpoTarjeta(uid) {
     res.forEach((nrc, posicion) => {
         let m = ofertaAcademica[nrc]; let hrs = m.horarios.map(h => `${h.dia} ${h.inicio}-${h.fin}`).join(' | ');
         let esFav = window.prefsGeneradorGlobal.favoritos.includes(m.profesor?.trim()) ? '⭐ ' : '';
+
+        // Si esta tarjeta trae un mapa de cupos (lo arma el Comparador de Horarios),
+        // mostramos el badge; el Generador normal no lo pasa, así que no cambia su vista.
+        let badgeCupos = '';
+        if (state.mapaCupos && state.mapaCupos[nrc]) {
+            const dis = state.mapaCupos[nrc].disponibles;
+            const color = dis > 0 ? '#30D158' : '#FF453A';
+            badgeCupos = ` · <span style="color:${color}; font-weight:bold;">${dis} cupo(s)</span>`;
+        }
+
         htmlList += `<li style="font-size:12px; margin-bottom:8px; color:var(--text-muted);">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                 <div style="flex:1; min-width:0;">
                     <strong style="color:#fff;">${m.materia}</strong><br>
-                    <span style="color:var(--accent-blue);">NRC: ${nrc}</span> | Prof: <span style="color:#fff">${esFav}${m.profesor || 'Por definir'}</span><br>
+                    <span style="color:var(--accent-blue);">NRC: ${nrc}</span> | Prof: <span style="color:#fff">${esFav}${m.profesor || 'Por definir'}</span>${badgeCupos}<br>
                     <i>${hrs}</i>
                 </div>
                 <button type="button" style="flex-shrink:0; background:rgba(10,132,255,0.15); color:#0A84FF; border:1px solid rgba(10,132,255,0.4); border-radius:8px; padding:5px 8px; font-size:11px; cursor:pointer; white-space:nowrap;" onclick="abrirSelectorMaestro('${uid}', ${posicion}, '${m.clave}')">🔄 Cambiar</button>
