@@ -123,6 +123,12 @@ async function ejecutarComparador() {
 
     const minCupos = parseInt(document.getElementById('comparadorMinCupos').value) || 1;
 
+    // cuerpoTarjeta() (reutilizada del Generador) lee window.prefsGeneradorGlobal
+    // directo, así que hay que garantizar que exista ANTES de renderizar
+    // cualquier tarjeta -- incluso si el usuario nunca corrió el Generador.
+    const prefs = obtenerPreferenciasParaComparador();
+    window.prefsGeneradorGlobal = prefs;
+
     // El modal de "Cambiar maestro" (reutilizado de la tarjeta) lee estos dos
     // controles del Generador para saber si debe pedir cupos en vivo y con qué
     // mínimo. El Comparador SIEMPRE trabaja con cupos en vivo, así que los
@@ -175,7 +181,6 @@ async function ejecutarComparador() {
 
     if (btn) btn.innerHTML = 'Buscando alternativas...';
 
-    const prefs = obtenerPreferenciasParaComparador();
     const nrcsConsiderados = nrcsEnOferta; // los que sí están en la oferta descargada
     const mapaOriginalPorGrupo = [];
     const esReemplazable = [];
