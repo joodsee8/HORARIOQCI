@@ -1,0 +1,21 @@
+<div id="comparador-page" class="page">
+            <div class="page-header">
+                <h2>Comparador de Horarios</h2>
+            </div>
+
+            <div class="buscador-container">
+                <h3 style="margin-top: 0;">1. Pega los NRC del horario a comparar</h3>
+                <p style="font-size:13px; color:var(--text-muted);">Uno por línea, separados por comas, o pega directo el .txt del Generador. Máximo 10 NRC.</p>
+                <textarea id="comparadorInputNrcs" rows="5" placeholder="Ej.&#10;123456&#10;654321&#10;987654&#10;456123&#10;741852" style="width:100%; padding:10px; border-radius:8px; background:rgba(0,0,0,0.2); border:1px solid var(--glass-border); color:#fff; font-family:monospace; font-size:13px; resize:vertical; margin-top:8px; box-sizing:border-box;"></textarea>
+            </div>
+
+            <div class="buscador-container">
+                <h3 style="margin-top: 0;">2. ¿Cuántos lugares libres necesitas?</h3>
+                <p style="font-size:13px; color:var(--text-muted);">Un NRC con menos cupos disponibles que este número se considera inválido.</p>
+                <input type="number" id="comparadorMinCupos" value="1" min="1" style="width:100px; margin-top:8px;">
+            </div>
+
+            <button class="btn-submit" id="btnComparar" onclick="ejecutarComparador()" style="margin-top:5px;">Comparar Horario</button>
+
+            <div id="resultadosComparador" style="margin-top:20px;"></div>
+        </div>
