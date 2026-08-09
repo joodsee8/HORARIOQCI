@@ -314,4 +314,4 @@ console.log("Rutas cargadas en memoria: /api/status, /api/respaldo/:codigo (POST
 // ENCENDEMOS EL MOTOR
 app.listen(PUERTO, '0.0.0.0', () => {
     console.log(`Servidor Backend ejecutandose en: http://localhost:${PUERTO}`);
-});
+}); 
