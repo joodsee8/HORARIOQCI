@@ -11,7 +11,7 @@ async function cambiarCatalogoCarrera() {
         cargarDatalist();
     } else {
         try {
-            const respuesta = await fetch(`https://horarioqci.onrender.com/api/catalogo/${carrera}`);
+            const respuesta = await fetch(`${API_BASE_URL}/api/catalogo/${carrera}`);
             if (!respuesta.ok) throw new Error("Catálogo no encontrado");
             const datosJson = await respuesta.json();
             txtArea.value = JSON.stringify(datosJson, null, 2);
@@ -47,7 +47,7 @@ function generarCatalogoDesdeOferta() {
     document.getElementById('jsonCatalogo').value = JSON.stringify(nuevoCatalogo, null, 2);
     document.getElementById('jsonCatalogo').disabled = false;
     cargarDatalist();
-    alert(`Catálogo auto-generado con ${Object.keys(nuevoCatalogo).length} materias.`);
+    alert(`¡PUM! 💥 Catálogo auto-generado con ${Object.keys(nuevoCatalogo).length} materias únicas.`);
 }
 
 function cargarDatalist() {
@@ -101,4 +101,3 @@ function gestionarEstado() {
     const calInput = document.getElementById('calificacion');
     if (est === 'aprobada' || est === 'reprobada' || est === 'convalidada') { calInput.disabled = false; } else { calInput.disabled = true; calInput.value = ''; }
 }
-
