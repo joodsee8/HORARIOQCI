@@ -3,7 +3,7 @@ import cors from 'cors';
 import * as cheerio from 'cheerio';
 import mongoose from 'mongoose'; 
 import 'dotenv/config'; 
-import { PerfilModel } from './perfil.js';
+import { PerfilModel } from './Perfil.js';
 import fs from 'fs';
 import axios from 'axios';
 
