@@ -1,12 +1,22 @@
-    <div class="sync-panel" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin: 10px;">
+<div class="sync-panel" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin: 10px;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-            <span style="font-size: 12px; font-weight: bold; color: var(--text-muted);">NUBE MONGODB</span>
+            <span style="font-size: 12px; font-weight: bold; color: var(--text-muted);">RESPALDO EN LA NUBE</span>
             <div id="statusLed" title="Desconectado" style="width: 10px; height: 10px; background: #FF453A; border-radius: 50%; box-shadow: 0 0 5px #FF453A;"></div>
         </div>
-        
-        <button class="btn-submit" onclick="respaldarEnNube()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: #007AFF;">
-            <span class="icon">☁️</span> Respaldar Progreso
-        </button>
-        
+
+        <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+            <span id="codigoRespaldoTexto">Sin código configurado</span>
+            <a href="#" onclick="cambiarCodigoRespaldo(); return false;" style="color:#0A84FF; text-decoration:none; font-size:11px; flex-shrink:0; margin-left:8px;">Cambiar</a>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+            <button class="btn-submit" onclick="respaldarEnNube()" style="flex:1; display: flex; align-items: center; justify-content: center; gap: 6px; background: #007AFF; font-size:12px; padding:10px;">
+                <span class="icon">☁️</span> Subir
+            </button>
+            <button class="btn-submit" onclick="restaurarDesdeNube()" style="flex:1; display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(255,255,255,0.08); color:#fff; font-size:12px; padding:10px;">
+                <span class="icon">⬇️</span> Bajar
+            </button>
+        </div>
+
         <p id="lastSync" style="font-size: 10px; color: var(--text-muted); margin-top: 8px; text-align: center;">Sin respaldos recientes</p>
     </div>
