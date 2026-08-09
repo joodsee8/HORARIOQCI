@@ -3,7 +3,7 @@ import cors from 'cors';
 import * as cheerio from 'cheerio';
 import mongoose from 'mongoose'; 
 import 'dotenv/config'; 
-import { MateriaModel } from './materia.js'; 
+import { PerfilModel } from './perfil.js';
 import fs from 'fs';
 import axios from 'axios';
 
@@ -12,7 +12,7 @@ const PUERTO = 3000;
 
 // Permisos abiertos para que el navegador no llore
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '2mb' })); // la malla completa puede pesar más que el default de express
 
 // Conexión a Base de Datos
 mongoose.connect(process.env.MONGO_URI as string)
@@ -26,19 +26,63 @@ app.get('/api/status', (req, res) => {
 });
 
 
-// --- RUTA 2: GUARDAR MALLA EN MONGODB ---
-app.post('/api/guardar-malla', async (req, res) => {
+const REGEX_CODIGO = /^\d{9}$/;
+
+// --- RUTA 2: SUBIR RESPALDO (malla + horario + carrera) asociado a un código de 9 dígitos ---
+// Upsert: si el código ya existía, reemplaza su respaldo; si no, lo crea.
+app.post('/api/respaldo/:codigo', async (req, res) => {
+    const { codigo } = req.params;
+
+    if (!REGEX_CODIGO.test(codigo)) {
+        return res.status(400).json({ error: "El código debe ser exactamente 9 dígitos." });
+    }
+
     try {
-        const { malla } = req.body; 
+        const { carrera, materias, horarioActual } = req.body;
 
-        await MateriaModel.deleteMany({}); 
-        const resultado = await MateriaModel.insertMany(malla);
+        const perfil = await PerfilModel.findOneAndUpdate(
+            { codigo },
+            {
+                codigo,
+                carrera: carrera || '',
+                materias: materias || [],
+                horarioActual: horarioActual || [],
+                actualizadoEn: new Date()
+            },
+            { upsert: true, new: true }
+        );
 
-        console.log(`[DB] Malla sincronizada: ${resultado.length} materias guardadas.`);
-        res.json({ mensaje: "Malla guardada en la nube con éxito", cantidad: resultado.length });
+        console.log(`[Respaldo] Código ${codigo}: ${(materias || []).length} materia(s) guardadas.`);
+        res.json({ mensaje: "Respaldo guardado en la nube con éxito", actualizadoEn: perfil.actualizadoEn });
     } catch (error) {
-        console.error("Error al guardar:", error);
+        console.error("Error al guardar respaldo:", error);
         res.status(500).json({ error: "No se pudo guardar en la base de datos" });
+    }
+});
+
+// --- RUTA 3: BAJAR RESPALDO por código de 9 dígitos ---
+app.get('/api/respaldo/:codigo', async (req, res) => {
+    const { codigo } = req.params;
+
+    if (!REGEX_CODIGO.test(codigo)) {
+        return res.status(400).json({ error: "El código debe ser exactamente 9 dígitos." });
+    }
+
+    try {
+        const perfil = await PerfilModel.findOne({ codigo });
+        if (!perfil) {
+            return res.status(404).json({ error: "No existe ningún respaldo con ese código." });
+        }
+
+        res.json({
+            carrera: perfil.carrera,
+            materias: perfil.materias,
+            horarioActual: perfil.horarioActual,
+            actualizadoEn: perfil.actualizadoEn
+        });
+    } catch (error) {
+        console.error("Error al leer respaldo:", error);
+        res.status(500).json({ error: "No se pudo leer la base de datos" });
     }
 });
 
@@ -264,11 +308,10 @@ app.post('/api/consultar-cupos', async (req, res) => {
 });
 
 // RASTREADOR DE RUTAS
-console.log("Rutas cargadas en memoria: /api/status, /api/guardar-malla, /api/extraer-oferta, /api/consultar-cupos");
+console.log("Rutas cargadas en memoria: /api/status, /api/respaldo/:codigo (POST/GET), /api/extraer-oferta, /api/consultar-cupos");
 
 // ENCENDEMOS EL MOTOR
 // ENCENDEMOS EL MOTOR
 app.listen(PUERTO, '0.0.0.0', () => {
     console.log(`Servidor Backend ejecutandose en: http://localhost:${PUERTO}`);
 });
-
