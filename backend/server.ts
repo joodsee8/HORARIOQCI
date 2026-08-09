@@ -310,8 +310,15 @@ app.post('/api/consultar-cupos', async (req, res) => {
 // RASTREADOR DE RUTAS
 console.log("Rutas cargadas en memoria: /api/status, /api/respaldo/:codigo (POST/GET), /api/extraer-oferta, /api/consultar-cupos");
 
-// ENCENDEMOS EL MOTOR
+// --- TEMPORAL: diagnóstico de rutas registradas ---
+app.get('/api/debug-rutas', (req, res) => {
+    const rutas = app._router.stack
+        .filter(r => r.route)
+        .map(r => `${Object.keys(r.route.methods).join(',').toUpperCase()} ${r.route.path}`);
+    res.json(rutas);
+});
+
 // ENCENDEMOS EL MOTOR
 app.listen(PUERTO, '0.0.0.0', () => {
     console.log(`Servidor Backend ejecutandose en: http://localhost:${PUERTO}`);
-}); 
+});
