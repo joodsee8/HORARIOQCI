@@ -7,7 +7,7 @@ async function checkBackendStatus() {
     const led = document.getElementById('statusLed');
     try {
         const res = await fetch(
-            'https://generador-horarios-cucei.onrender.com/api/status'
+            'https://horarioqci.onrender.com/api/status'
         );
         if (!res.ok) throw new Error();
         led.style.background = "#30D158";
@@ -338,7 +338,7 @@ async function respaldarEnNube() {
     };
     try {
         const respuesta = await fetch(
-            `https://generador-horarios-cucei.onrender.com/api/respaldo/${codigo}`,
+            `https://horarioqci.onrender.com/api/respaldo/${codigo}`,
             {
                 method: 'POST',
                 headers: {
@@ -461,7 +461,7 @@ async function restaurarDesdeNube() {
         "<span>⏳</span> Buscando...";
     try {
         const respuesta = await fetch(
-            `https://generador-horarios-cucei.onrender.com/api/respaldo/${codigo}`
+            `https://horarioqci.onrender.com/api/respaldo/${codigo}`
         );
         // ---------------------------------------------------------
         // RESPALDO NO ENCONTRADO
