@@ -183,6 +183,7 @@ async function restaurarDesdeNube() {
         guardarDatos();
         guardarHorario();
         actualizarVistas();
+        renderizarHorario(); // actualizarVistas() no repinta el calendario semanal; hay que forzarlo aparte
         if (document.getElementById('dashboard-page')?.classList.contains('active')) renderizarDashboard();
 
         btn.style.background = "#30D158"; btn.innerHTML = "<span>✅</span> ¡Listo!";
