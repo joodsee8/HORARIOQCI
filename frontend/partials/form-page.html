@@ -13,8 +13,8 @@
                             <option value="INDU">Ingeniería Industrial (INDU)</option>
                             <option value="CUSTOM">Otra / Personalizado (Pegar JSON)</option>
                         </select>
-                        <button type="button" class="btn-submit" onclick="cargarMallaCompleta()" style="margin-top: 8px; padding: 8px; font-size: 12px; background: rgba(191, 90, 242, 0.2) !important; color: #BF5AF2 !important; border: 1px solid rgba(191, 90, 242, 0.4);">
-                            📥 Cargar Malla Completa de esta Carrera
+                        <button type="button" class="btn-submit" onclick="cargarMallaDeCarrera(document.getElementById('selectorCarrera').value)" style="margin-top: 8px; padding: 8px; font-size: 12px; background: rgba(191, 90, 242, 0.2) !important; color: #BF5AF2 !important; border: 1px solid rgba(191, 90, 242, 0.4);">
+                            🔄 Restaurar Malla Oficial de esta Carrera
                         </button>
                     </div>
                     <div style="flex: 2; min-width: 250px;">
