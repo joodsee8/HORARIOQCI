@@ -33,16 +33,41 @@ function cargarSemestreGenerador() {
     const matSemestre = materias.filter(m => m.semestre === sem && m.estado !== 'aprobada' && m.estado !== 'convalidada' && m.nrc !== 'SSINQU' && m.nrc !== 'IA896');
     if(matSemestre.length === 0) return alert(`No hay materias pendientes por cursar en el semestre ${sem}.`);
     
-    let agregadas = 0; let noEncontradas = [];
+    let agregadas = 0; let noEncontradas = []; let omitidasOptativas = [];
     matSemestre.forEach(m => {
-        let existeEnOferta = Object.values(ofertaAcademica).some(o => o.clave === (m.nrcOriginal || m.nrc));
+        const claveMateria = m.nrcOriginal || m.nrc;
+        const infoOptativa = obtenerInfoOptativa(claveMateria);
+
+        if (infoOptativa) {
+            // Es un espacio de optativa (OAINQU, etc.), no una clave real del SIIAU:
+            // preguntamos cuál optativa concreta va a cursar. Opcional: si no
+            // escribe nada, esa materia simplemente no entra a este generado.
+            const claveReal = prompt(`"${m.nombre}" es una optativa (${infoOptativa.nombre}).\n\nEscribe la CLAVE real de la materia que vas a cursar, tal como aparece en la oferta del SIIAU (ej. I5828).\n\nDéjalo vacío para omitirla por ahora.`, '');
+            if (!claveReal || !claveReal.trim()) { omitidasOptativas.push(m.nombre); return; }
+
+            const claveRealLimpia = claveReal.trim().toUpperCase();
+            const existeEnOferta = Object.values(ofertaAcademica).some(o => o.clave === claveRealLimpia);
+            if (!existeEnOferta) { noEncontradas.push(`${m.nombre} (la clave "${claveRealLimpia}" no está en la oferta que descargaste)`); return; }
+
+            if (!cursosGenerador.find(c => c.clave === claveRealLimpia)) {
+                cursosGenerador.push({ clave: claveRealLimpia, nombre: `${m.nombre} · ${claveRealLimpia}` });
+                agregadas++;
+            }
+            return;
+        }
+
+        let existeEnOferta = Object.values(ofertaAcademica).some(o => o.clave === claveMateria);
         if(existeEnOferta) {
-            if(!cursosGenerador.find(c => c.clave === (m.nrcOriginal || m.nrc))) { cursosGenerador.push({ clave: (m.nrcOriginal || m.nrc), nombre: m.nombre }); agregadas++; }
+            if(!cursosGenerador.find(c => c.clave === claveMateria)) { cursosGenerador.push({ clave: claveMateria, nombre: m.nombre }); agregadas++; }
         } else { noEncontradas.push(m.nombre); }
     });
 
     renderizarListaGenerador(); actualizarListaMaestros();
-    if(noEncontradas.length > 0) alert(`Se agregaron ${agregadas} materias.\n\nIgnoradas (No se ofertaron):\n- ${noEncontradas.join('\n- ')}`);
+
+    let resumen = `Se agregaron ${agregadas} materias.`;
+    if (omitidasOptativas.length > 0) resumen += `\n\nOptativas omitidas (sin clave capturada):\n- ${omitidasOptativas.join('\n- ')}`;
+    if (noEncontradas.length > 0) resumen += `\n\nIgnoradas (No se ofertaron):\n- ${noEncontradas.join('\n- ')}`;
+    if (omitidasOptativas.length > 0 || noEncontradas.length > 0) alert(resumen);
 }
 
 function agregarCursoGenerador(val) {
