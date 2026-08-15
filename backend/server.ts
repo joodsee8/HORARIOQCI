@@ -3,7 +3,7 @@ import cors from 'cors';
 import * as cheerio from 'cheerio';
 import mongoose from 'mongoose'; 
 import 'dotenv/config'; 
-import { PerfilModel } from './Perfil.js';
+import { PerfilModel } from './perfil.js';
 import fs from 'fs';
 import axios from 'axios';
 
@@ -185,6 +185,24 @@ app.get('/api/catalogo/:carrera', (req, res) => {
     }
 });
 
+// --- RUTA 4b: LEER MALLA CURRICULAR YA ARMADA (por carrera) ---
+// Carpeta separada de "catalogos" a propósito: el catálogo es el diccionario
+// de "todas las materias" (para el autocompletado); esto es la malla ya
+// puesta semestre por semestre, lista para cargarse tal cual en la malla del
+// alumno. Mismo formato que ya usa "Restaurar desde JSON" en el frontend
+// (un arreglo de materias).
+app.get('/api/malla/:carrera', (req, res) => {
+    const carrera = req.params.carrera;
+    const rutaArchivo = `./mallas/${carrera}.json`;
+
+    if (fs.existsSync(rutaArchivo)) {
+        const archivo = fs.readFileSync(rutaArchivo, 'utf-8');
+        res.json(JSON.parse(archivo));
+    } else {
+        res.status(404).json({ error: "No se encontró la malla curricular de esta carrera" });
+    }
+});
+
 // --- RUTA 5: SNIPER DE CUPOS EN VIVO (REAL) ---
 app.post('/api/verificar-cupos', async (req, res) => {
     // Ahora recibimos también el centro y la carrera para saber qué página buscar
@@ -308,16 +326,9 @@ app.post('/api/consultar-cupos', async (req, res) => {
 });
 
 // RASTREADOR DE RUTAS
-console.log("Rutas cargadas en memoria: /api/status, /api/respaldo/:codigo (POST/GET), /api/extraer-oferta, /api/consultar-cupos");
+console.log("Rutas cargadas en memoria: /api/status, /api/respaldo/:codigo (POST/GET), /api/catalogo/:carrera, /api/malla/:carrera, /api/extraer-oferta, /api/consultar-cupos");
 
-// --- TEMPORAL: diagnóstico de rutas registradas ---
-app.get('/api/debug-rutas', (req, res) => {
-    const rutas = app._router.stack
-        .filter(r => r.route)
-        .map(r => `${Object.keys(r.route.methods).join(',').toUpperCase()} ${r.route.path}`);
-    res.json(rutas);
-});
-
+// ENCENDEMOS EL MOTOR
 // ENCENDEMOS EL MOTOR
 app.listen(PUERTO, '0.0.0.0', () => {
     console.log(`Servidor Backend ejecutandose en: http://localhost:${PUERTO}`);
