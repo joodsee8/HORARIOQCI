@@ -25,6 +25,67 @@ async function cambiarCatalogoCarrera() {
     localStorage.setItem('carreraSeleccionada', carrera);
 }
 
+/**
+ * Importa TODAS las materias del catálogo de la carrera seleccionada a la
+ * malla del propio alumno (el arreglo `materias`, editable y respaldable).
+ * No borra nada existente: si una clave ya está en la malla, se salta. Las
+ * claves de optativa comodín (OAINQU, etc.) se agregan como UN espacio
+ * placeholder; el alumno puede duplicarlas manualmente si su plan requiere
+ * varias, y agregarMateria() las auto-numera para no chocar entre sí.
+ */
+async function cargarMallaCompleta() {
+    const carrera = document.getElementById('selectorCarrera').value;
+    if (!carrera || carrera === 'CUSTOM') {
+        alert('Selecciona una carrera del catálogo (no "Personalizado") para cargar su malla completa.');
+        return;
+    }
+
+    if (materias.length > 0) {
+        if (!confirm('Ya tienes materias registradas. Cargar la malla de esta carrera AGREGARÁ las que te falten (no borra ni toca lo que ya tienes). ¿Continuar?')) return;
+    }
+
+    let catalogo;
+    try {
+        const respuesta = await fetch(`${API_BASE_URL}/api/catalogo/${carrera}`);
+        if (!respuesta.ok) throw new Error();
+        catalogo = await respuesta.json();
+    } catch (e) {
+        alert('No se pudo cargar el catálogo de esa carrera desde el servidor.');
+        return;
+    }
+
+    let agregadas = 0;
+    let sinSemestre = 0;
+
+    for (const clave in catalogo) {
+        const c = catalogo[clave];
+
+        if (typeof c.semestre !== 'number') { sinSemestre++; continue; } // catálogo viejo sin esa info: no se auto-carga
+        if (materias.some(m => m.nrc === clave)) continue; // ya la tiene
+
+        const letra = encontrarLetraLibre(c.semestre, c.letra || 'A');
+        materias.push({
+            nrc: clave, nrcOriginal: clave, nombre: c.nombre, semestre: c.semestre, letra,
+            apertura: c.apertura || 'ambos', creditos: c.creditos || 0, estado: 'pendiente', calificacion: 0,
+            prerequisito: c.prereq || '', correquisito: c.correq || '', color: c.color || '#8E8E93',
+            recursamientoGenerado: false, esArt34: false, esOptativa: !!c.esOptativa
+        });
+        agregadas++;
+    }
+
+    if (agregadas === 0) {
+        alert(sinSemestre > 0
+            ? 'Ese catálogo no trae información de semestre por materia, así que no se puede auto-cargar (revísalo o pégalo manualmente).'
+            : 'No había materias nuevas por agregar; ya tienes toda la malla de esta carrera.');
+        return;
+    }
+
+    guardarDatos();
+    procesarNormatividadYDependencias();
+    actualizarVistas();
+    alert(`✅ Se agregaron ${agregadas} materia(s) de la malla de ${carrera} a tu malla.`);
+}
+
 function generarCatalogoDesdeOferta() {
     if(Object.keys(ofertaAcademica).length === 0) { alert("⚠️ Primero extrae la oferta del SIIAU."); return; }
     const nuevoCatalogo = {};
