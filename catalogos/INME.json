@@ -1,1 +1,562 @@
-{}
+{
+  "I7406": {
+    "nombre": "LIDERAZGO",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7446": {
+    "nombre": "TALLER DE MEDICIONES MECANICAS Y ELECTRICAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I5802": {
+    "nombre": "ALGEBRA LINEAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I6184": {
+    "nombre": "COMPORTAMIENTO HUMANO EN LAS ORGANIZACIONES",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I5799": {
+    "nombre": "PRECALCULO",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7370": {
+    "nombre": "ADMINISTRACION",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7381": {
+    "nombre": "ETICA PROFESIONAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I6920": {
+    "nombre": "PROBABILIDAD Y ESTADISTICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7412": {
+    "nombre": "ESTATICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7415": {
+    "nombre": "QUIMICA BASICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7418": {
+    "nombre": "TALLER DE EXPRESION ORAL Y ESCRITA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7421": {
+    "nombre": "CALCULO DIFERENCIAL E INTEGRAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7426": {
+    "nombre": "INGENIERIA DE LOS MATERIALES",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7429": {
+    "nombre": "DIBUJO INDUSTRIAL ASISTIDO POR COMPUTADORA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7464": {
+    "nombre": "SEMINARIO MODULAR I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7465": {
+    "nombre": "SEMINARIO MODULAR II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7438": {
+    "nombre": "INGENIERIA DE COSTOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7420": {
+    "nombre": "CALCULO AVANZADO",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7423": {
+    "nombre": "MATEMATICAS AVANZADAS PARA INGENIERIA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7439": {
+    "nombre": "SISTEMAS AMBIENTALES  I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7424": {
+    "nombre": "INGENIERIA TERMODINAMICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7466": {
+    "nombre": "SEMINARIO MODULAR III",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7413": {
+    "nombre": "DINAMICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7404": {
+    "nombre": "PROGRAMACION APLICADA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7448": {
+    "nombre": "SISTEMAS AMBIENTALES II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7433": {
+    "nombre": "FLUIDOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7441": {
+    "nombre": "CINEMATICA Y DINAMICA DE MAQUINAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7467": {
+    "nombre": "SEMINARIO MODULAR IV",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7445": {
+    "nombre": "LABORATORIO DE MECANICA DE FLUIDOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7422": {
+    "nombre": "ECUACIONES DIFERENCIALES ORDINARIAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7414": {
+    "nombre": "ELECTROMAGNETISMO PARA INGENIERIA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7417": {
+    "nombre": "OPTICA Y ACUSTICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7434": {
+    "nombre": "MECANICA DE MATERIALES",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7430": {
+    "nombre": "LABORATORIO DE CIRCUITOS ELECTRICOS I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7440": {
+    "nombre": "FORMACION EMPRESARIAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7468": {
+    "nombre": "SEMINARIO MODULAR V",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7419": {
+    "nombre": "METODOS NUMERICOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7427": {
+    "nombre": "CIRCUITOS ELECTRICOS I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7450": {
+    "nombre": "LABORATORIO DE MAQUINAS HIDRAULICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7452": {
+    "nombre": "MAQUINAS HIDRAULICAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7442": {
+    "nombre": "DISEÑO DE ELEMENTOS DE MAQUINAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7451": {
+    "nombre": "LABORATORIO DE PROCESOS DE MANUFACTURA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7469": {
+    "nombre": "SEMINARIO MODULAR VI",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7453": {
+    "nombre": "PROCESOS DE MANUFACTURA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7447": {
+    "nombre": "SISTEMAS NEUMATICOS E HIDRAULICOS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7431": {
+    "nombre": "LABORATORIO DE CIRCUITOS ELECTRICOS II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7428": {
+    "nombre": "CIRCUITOS ELECTRICOS II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7443": {
+    "nombre": "INSTALACIONES ELECTRICAS E ILUMINACION",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7432": {
+    "nombre": "MAQUINAS TERMICAS I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7460": {
+    "nombre": "LABORATORIO DE MAQUINAS ELECTRICAS I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7470": {
+    "nombre": "SEMINARIO MODULAR VII",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7436": {
+    "nombre": "ELECTRONICA ANALOGICA Y DIGITAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7425": {
+    "nombre": "INGENIERIA DE CONTROL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7455": {
+    "nombre": "MAQUINAS ELECTRICAS I",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7454": {
+    "nombre": "MAQUINAS TERMICAS II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7444": {
+    "nombre": "INSTALACIONES MECANICAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7471": {
+    "nombre": "SEMINARIO MODULAR VIII",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7457": {
+    "nombre": "SISTEMAS DE CONTROL SECUENCIAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7462": {
+    "nombre": "REDES ELECTRICAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7459": {
+    "nombre": "LABORATORIO DE MAQUINAS ELECTRICAS II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7458": {
+    "nombre": "LABORATORIO DE SISTEMAS DE CONTROL SECUENCIAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7456": {
+    "nombre": "MAQUINAS ELECTRICAS II",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7577": {
+    "nombre": "FUENTES ALTERNAS DE ENERGIA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7575": {
+    "nombre": "PROPIEDAD INTELECTUAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7463": {
+    "nombre": "SUBESTACIONES ELECTRICAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7461": {
+    "nombre": "REFRIGERACION Y AIRE ACONDICIONADO",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7437": {
+    "nombre": "AUTOMATIZACION",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7472": {
+    "nombre": "SEMINARIO MODULAR IX",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7561": {
+    "nombre": "SISTEMAS Y EQUIPOS DE CONTROL DE CONTAMINACION AMBIENTAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7563": {
+    "nombre": "MANUFACTURA AVANZADA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7566": {
+    "nombre": "ROBOTICA INDUSTRIAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7569": {
+    "nombre": "EQUIPOS PARA TRANSFERENCIA DE CALOR",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7570": {
+    "nombre": "AERODINAMICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "I7571": {
+    "nombre": "DISEÑO HERRAMENTAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  },
+  "I7580": {
+    "nombre": "INGENIERIA ECONOMICA",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#f5950f"
+  },
+  "I7581": {
+    "nombre": "PSICOLOGIA INDUSTRIAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0ff5f1"
+  },
+  "I7478": {
+    "nombre": "DISEÑO DE MAQUINAS",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#ff75d3"
+  },
+  "I7568": {
+    "nombre": "DISEÑO Y MANUFACTURA CAD-CAM",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#0A84FF"
+  },
+  "I7565": {
+    "nombre": "ELECTRONICA INDUSTRIAL",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#58db33"
+  },
+  "V2455": {
+    "nombre": "ANALISIS DE PROBLEMAS GLOBALES DEL SIGLO XXI",
+    "creditos": 8,
+    "prereq": "",
+    "correq": "",
+    "color": "#b61bee"
+  }
+}
