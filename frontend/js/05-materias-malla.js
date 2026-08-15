@@ -81,17 +81,25 @@ function agregarMateria() {
     if (!nrc || !nombre || isNaN(semestre) || isNaN(creditos)) { alert("Completa los campos obligatorios."); return; }
     if (estado === 'aprobada' && calificacion < 60) { estado = 'reprobada'; } else if (estado === 'reprobada' && calificacion >= 60) { estado = 'aprobada'; }
 
+    // Las claves de optativa comodín (OAINQU, etc.) se pueden repetir en la
+    // malla del alumno; se numeran solas para no chocar (OAINQU, OAINQU-2, ...).
+    let nrcFinal = nrc;
+    if (!editandoNRC && esClaveOptativa(nrc)) {
+        let intento = 2;
+        while (materias.some(m => m.nrc === nrcFinal)) { nrcFinal = `${nrc}-${intento}`; intento++; }
+    }
+
     const indexExistente = materias.findIndex(m => m.semestre === semestre && m.letra === letra);
 
     if (editandoNRC) {
         const indexOriginal = materias.findIndex(m => m.nrc === editandoNRC);
         if (indexExistente !== -1 && indexExistente !== indexOriginal) { if (!confirm(`Ya existe materia en ${semestre}${letra}. ¿Reemplazar?`)) return; materias.splice(indexExistente, 1); }
         const iFinal = materias.findIndex(m => m.nrc === editandoNRC);
-        materias[iFinal] = { ...materias[iFinal], nrc, nombre, semestre, letra, apertura, creditos, estado, calificacion, prerequisito, correquisito, color };
+        materias[iFinal] = { ...materias[iFinal], nrc: nrcFinal, nombre, semestre, letra, apertura, creditos, estado, calificacion, prerequisito, correquisito, color };
         cancelarEdicion();
     } else {
         if (indexExistente !== -1) { if (!confirm(`Ya existe materia en ${semestre}${letra}. ¿Reemplazar?`)) return; materias.splice(indexExistente, 1); }
-        materias.push({ nrc, nrcOriginal: nrc, nombre, semestre, letra, apertura, creditos, estado, calificacion, prerequisito, correquisito, color, recursamientoGenerado: false, esArt34: false });
+        materias.push({ nrc: nrcFinal, nrcOriginal: nrcFinal, nombre, semestre, letra, apertura, creditos, estado, calificacion, prerequisito, correquisito, color, recursamientoGenerado: false, esArt34: false, esOptativa: esClaveOptativa(nrc) });
         cancelarEdicion();
     }
     guardarDatos(); procesarNormatividadYDependencias(); actualizarVistas();
@@ -142,4 +150,3 @@ window.cambiarEstadoSemestre = function(semestre, nuevoEstado) {
     });
     if(cambios) { guardarDatos(); procesarNormatividadYDependencias(); actualizarVistas(); }
 }
-
