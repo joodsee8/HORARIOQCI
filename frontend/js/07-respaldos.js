@@ -19,9 +19,7 @@ function procesarArchivoCargado(event) {
             const contenido = JSON.parse(e.target.result);
             if (Array.isArray(contenido)) {
                 if (confirm("¿Cargar este respaldo? Reemplazará tu malla actual.")) {
-                    materias = contenido; sanitizarDatosGuardados(); guardarDatos(); actualizarVistas();
-                    if(document.getElementById('dashboard-page').classList.contains('active')) renderizarDashboard();
-                    alert("Respaldo cargado exitosamente.");
+                    aplicarMallaCargada(contenido, "Respaldo cargado exitosamente.");
                 }
             } else { alert("Formato incorrecto."); }
         } catch (error) { alert("Error al leer el JSON."); }
@@ -30,3 +28,20 @@ function procesarArchivoCargado(event) {
     lector.readAsText(archivo);
 }
 
+/**
+ * Reemplaza `materias` por el arreglo dado y refresca todo. La usan tanto
+ * "Restaurar desde JSON" (subida manual de archivo) como la carga
+ * automática de la malla curricular al elegir carrera -- una sola lógica,
+ * dos formas de llegar a ella.
+ * @param {Array} arregloMaterias
+ * @param {string} mensajeExito
+ */
+function aplicarMallaCargada(arregloMaterias, mensajeExito) {
+    materias = arregloMaterias;
+    sanitizarDatosGuardados();
+    guardarDatos();
+    procesarNormatividadYDependencias();
+    actualizarVistas();
+    if (document.getElementById('dashboard-page')?.classList.contains('active')) renderizarDashboard();
+    if (mensajeExito) alert(mensajeExito);
+}
